@@ -1,5 +1,4 @@
 import axios, { Method, AxiosResponse } from 'axios';
-import { showErrorMessage } from '../helpers/userInteraction';
 import { Settings } from './settings';
 
 export class Resources {

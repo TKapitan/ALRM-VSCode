@@ -6,10 +6,6 @@ import { ObjectType } from '../models/objectType';
 
 const AlLanguage: string = 'ms-dynamics-smb.al';
 
-export function getFile(filename: string, workspaceUri?: vscode.Uri) {
-    // vscode.workspace.fs.readFile(vscode.Uri.joinPath(workspaceUri, filename));
-}
-
 export function readAppJson(workspaceFolderUri?: vscode.Uri): App {
     if (!workspaceFolderUri)
         workspaceFolderUri = getCurrentWorkspaceUri();
@@ -41,7 +37,6 @@ export function readSnippetFile(objectType: ObjectType): Buffer {
     if (!userProfilePath)
         throw new Error('User profile inaccessible!');
 
-    // thanks Waldo!
     let files = fs.readdirSync(join(userProfilePath, '.vscode', 'extensions'));
 
     let snippetFileName = objectTypeSnippetFileName(objectType);

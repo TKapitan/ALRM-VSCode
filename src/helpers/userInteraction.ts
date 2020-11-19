@@ -29,7 +29,6 @@ export async function getUserSelection(items: string[]): Promise<string | undefi
     return await vscode.window.showQuickPick(items);
 }
 
-
 export async function promptInitialization() {
     const InitializeAction: string = 'Initialize';
 
