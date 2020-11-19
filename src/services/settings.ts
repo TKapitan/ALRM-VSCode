@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-const CONFIG_KEY: string = 'al-id-range-manager';
+export const CONFIG_KEY: string = 'al-id-range-manager';
 
 export class Settings {
     private apiBaseUrl?: string;
@@ -21,5 +21,12 @@ export class Settings {
         this.apiBaseUrl = config.get('baseUrl');
         this.apiUsername = config.get('username');
         this.apiPassword = config.get('password');
+    }
+
+    public validate(): boolean {
+        if ((this.ApiBaseUrl ?? '') === '' || (this.ApiUsername ?? '') === '' || (this.ApiPassword ?? '') === '')
+            return false;
+
+        return true;
     }
 }

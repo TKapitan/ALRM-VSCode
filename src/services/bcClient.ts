@@ -1,4 +1,5 @@
 import axios, { Method, AxiosResponse } from 'axios';
+import { showErrorMessage } from '../helpers/userInteraction';
 import { Settings } from './settings';
 
 export class Resources {
@@ -29,7 +30,7 @@ export class BcClient {
     }
 
     private validateSettings(settings: Settings) {
-        if (settings.ApiBaseUrl === undefined || settings.ApiUsername === undefined || settings.ApiPassword === undefined)
+        if (!settings.validate())
             throw new Error('Provide api url, name and password in settings!');
     }
 

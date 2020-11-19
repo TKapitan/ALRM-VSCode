@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getUserInput, getUserSelection, showErrorMessage } from '../helpers/userInteraction';
+import { getUserInput, getUserSelection, promptInitialization, showErrorMessage } from '../helpers/userInteraction';
 import { getObjectTypeNumber, ObjectType } from '../models/objectType';
 import { ExtensionService } from '../services/extensionService';
 import { getCurrentWorkspaceUri, readSnippetFile } from '../services/fileService';
@@ -10,7 +10,7 @@ export async function NewObjectCommand() {
 
     let extension = await service.getExtension(workspaceUri);
     if (extension === null) {
-        showErrorMessage('Extension is not initialized, use the initialize command first!'); // XXX add shortcut button for initialization
+        promptInitialization();
         return;
     }
 

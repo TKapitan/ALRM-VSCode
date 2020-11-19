@@ -13,7 +13,8 @@
 	"activationEvents": [
 		"onCommand:al-id-range-manager.initialize",
 		"onCommand:al-id-range-manager.newObject",
-		"onCommand:al-id-range-manager.newObjectLine"
+		"onCommand:al-id-range-manager.newObjectLine",
+		"onLanguage:al"
 	],
 	"main": "./out/extension.js",
 	"contributes": {

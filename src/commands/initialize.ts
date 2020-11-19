@@ -21,7 +21,7 @@ export async function InitiliazeCommand() {
 
     let service = new ExtensionService();
     // 2. query api, extension may already exist
-    let extension = await service.getExtension(workspaceUri); // TODO throws
+    let extension = await service.getExtension(workspaceUri);
     if (extension !== null) {
         showInformationMessage(`Existing extension ${extension.code} found!`);
         // XXX at this point we could ask the user if they want to synchronize?
@@ -42,7 +42,7 @@ export async function InitiliazeCommand() {
             {
                 id: app.id,
                 rangeCode: range,
-                name: app.name.substring(0, 250), // TODO verify size
+                name: app.name.substring(0, 50),
                 description: app.description.substr(0, 250),
             });
 

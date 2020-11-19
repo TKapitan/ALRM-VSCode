@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { showErrorMessage } from "../helpers/userInteraction";
+import { promptInitialization, showErrorMessage } from "../helpers/userInteraction";
 import { ObjectType } from "../models/objectType";
 import { ExtensionService } from "../services/extensionService";
 import { getCurrentWorkspaceUri, readCurrentFile } from "../services/fileService";
@@ -24,7 +24,7 @@ export async function NewObjectLineCommand() {
     let service = new ExtensionService();
     let extension = await service.getExtension(workspaceUri);
     if (extension === null) {
-        showErrorMessage('Extension is not initialized, use the initialize command first!'); // XXX add shortcut button for initialization
+        promptInitialization();
         return;
     }
 
