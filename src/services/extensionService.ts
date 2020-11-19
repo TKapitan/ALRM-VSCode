@@ -43,7 +43,7 @@ export default class ExtensionService {
         let response = await this.client.callAction(Resources.Extension, extension.code, 'createObject', {
             objectType: objectType.toString(),
             objectName: objectName,
-            createdBy: '', // TODO
+            createdBy: this.client.username?.substr(0, 50) ?? '',
         });
 
         let objectId = Number(response);

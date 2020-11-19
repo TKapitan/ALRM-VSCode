@@ -16,14 +16,15 @@ interface QueryParameters {
 
 export default class BcClient {
     private baseUrl: string;
+    private settings: Settings;
 
     constructor() {
-        let settings = new Settings();
-        this.validateSettings(settings);
+        this.settings = new Settings();
+        this.validateSettings(this.settings);
 
-        this.baseUrl = settings.ApiBaseUrl ?? '';
+        this.baseUrl = this.settings.ApiBaseUrl ?? '';
 
-        let authorization: string = Buffer.from(`${settings.ApiUsername}:${settings.ApiPassword}`).toString('base64');
+        let authorization: string = Buffer.from(`${this.settings.ApiUsername}:${this.settings.ApiPassword}`).toString('base64');
         axios.defaults.validateStatus = (status: number) => status >= 200 && status < 500;
         axios.defaults.headers.common['Authorization'] = `Basic ${authorization}`;
     }
@@ -31,6 +32,10 @@ export default class BcClient {
     private validateSettings(settings: Settings) {
         if (!settings.validate())
             throw new Error('Provide api url, name and password in settings!');
+    }
+
+    public get username() {
+        return this.settings.ApiUsername;
     }
 
     public async read(resource: string, id: string): Promise<Object> {
