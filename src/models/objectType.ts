@@ -1,14 +1,14 @@
 export enum ObjectType {
-    Table = "Table",
-    TableExtension = "Table Extension",
-    Page = "Page",
-    PageExtension = "Page Extension",
-    Codeunit = "Codeunit",
-    Report = "Report",
-    XMLPort = "XML Port",
-    Query = "Query",
-    Enum = "Enum",
-    EnumExtension = "Enum Extension",
+    Table,
+    TableExtension,
+    Page,
+    PageExtension,
+    Codeunit,
+    Report,
+    XMLPort,
+    Query,
+    Enum,
+    EnumExtension,
 }
 
 export function getObjectTypeNumber(objectType: ObjectType): number {

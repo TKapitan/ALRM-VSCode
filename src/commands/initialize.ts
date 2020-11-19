@@ -1,7 +1,6 @@
 import { readAppJson, getCurrentWorkspaceUri } from "../services/fileService";
 import { ExtensionService } from "../services/extensionService";
 import { showInformationMessage, showErrorMessage, getUserSelection } from "../helpers/userInteraction";
-import { BcClient } from "../services/bcClient";
 import { Extension } from "../models/extension";
 import { App } from '../models/app';
 
@@ -20,8 +19,7 @@ export async function InitiliazeCommand() {
         return;
     }
 
-    let bcClient = new BcClient();
-    let service = new ExtensionService(bcClient);
+    let service = new ExtensionService();
     // 2. query api, extension may already exist
     let extension = await service.getExtension(workspaceUri); // TODO throws
     if (extension !== null) {
@@ -32,7 +30,7 @@ export async function InitiliazeCommand() {
     }
 
     // XXX add range min/max to API
-    let assignableRanges = await bcClient.getAllAssignableRanges();
+    let assignableRanges = await service.getAllAssignableRanges();
     // XXX then edit app.json ranges
 
     let range = await getUserSelection(assignableRanges.map(e => e.code));

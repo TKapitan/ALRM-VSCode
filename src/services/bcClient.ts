@@ -1,9 +1,7 @@
 import axios, { Method, AxiosResponse } from 'axios';
 import { Settings } from './settings';
-import { Extension } from '../models/extension';
-import { AssignableRange } from '../models/assignableRange';
 
-class Resources {
+export class Resources {
     public static readonly Extension = 'extensions';
     public static readonly ExtensionObject = 'extensionObjects';
     public static readonly ExtensionObjectField = 'extensionObjectFields';
@@ -26,7 +24,8 @@ export class BcClient {
         this.baseUrl = settings.ApiBaseUrl ?? '';
 
         let authorization: string = Buffer.from(`${settings.ApiUsername}:${settings.ApiPassword}`).toString('base64');
-        axios.defaults.validateStatus = (status: number) => status >= 200 && status < 500; // TODO
+        // TODO does not seem to work ? 
+        // axios.defaults.validateStatus = (status: number) => status >= 200 && status < 500;
         axios.defaults.headers.common['Authorization'] = `Basic ${authorization}`;
     }
 
@@ -35,40 +34,7 @@ export class BcClient {
             throw new Error('Provide api url, name and password in settings!');
     }
 
-    public async getExtension(id: string): Promise<Extension | null> {
-        let extensions = await this.readMultiple(Resources.Extension, {
-            top: 1,
-            filter: `id eq ${id}`
-        });
-
-        if (extensions.length === 0)
-            return null;
-
-        return Extension.fromJson(extensions[0]);
-    }
-
-    public async createExtension(data: Object): Promise<Extension> {
-        let extension = await this.create(Resources.Extension, data);
-
-        return Extension.fromJson(extension);
-    }
-
-    public async createExtensionObject(extension: Extension, data: Object): Promise<number> {
-        let response = await this.callAction(Resources.Extension, extension.id, 'createLine', data);
-
-        let objectId = Number(response);
-        if (isNaN(objectId))
-            throw new Error(`Unexpected object id response: ${response}`);
-        return objectId;
-    }
-
-    public async getAllAssignableRanges(): Promise<AssignableRange[]> {
-        let assignableRanges = await this.readAll(Resources.AssignableRange);
-
-        return assignableRanges.map(e => AssignableRange.fromJson(e));
-    }
-
-    private async read(resource: string, id: string): Promise<Object> {
+    public async read(resource: string, id: string): Promise<Object> {
         let response = await this.sendRequest('GET', this.buildUrl(resource, id));
 
         if (response.data === null || typeof response.data !== 'object')
@@ -77,7 +43,7 @@ export class BcClient {
         return response.data;
     }
 
-    private async readMultiple(resource: string, parameters?: QueryParameters): Promise<Object[]> {
+    public async readMultiple(resource: string, parameters?: QueryParameters): Promise<Object[]> {
         let response = await this.sendRequest('GET', this.buildUrl(resource, undefined, undefined, parameters));
 
         let x = typeof response.data;
@@ -90,7 +56,7 @@ export class BcClient {
         throw new Error(`Unexpected return type: ${typeof response.data['value']}`);
     }
 
-    private async readAll(resource: string, filter?: string): Promise<Object[]> {
+    public async readAll(resource: string, filter?: string): Promise<Object[]> {
         let querySize = 50;
         let offset = 0;
 
@@ -113,7 +79,7 @@ export class BcClient {
         return result;
     }
 
-    private async create(resource: string, data: Object): Promise<Object> {
+    public async create(resource: string, data: Object): Promise<Object> {
         let response = await this.sendRequest('POST', this.buildUrl(resource), data);
 
         if (response.data === null || typeof response.data !== 'object')
@@ -122,7 +88,7 @@ export class BcClient {
         return response.data;
     }
 
-    private async callAction(
+    public async callAction(
         resource: string,
         id: string,
         actionName: string,
@@ -172,7 +138,7 @@ export class BcClient {
 
         url += resource;
         if (id !== undefined)
-            url += `(${id})`;
+            url += `('${id}')`;
         if (actionName !== undefined)
             url += `/Microsoft.NAV.${actionName}`;
 

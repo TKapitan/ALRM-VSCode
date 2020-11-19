@@ -11,7 +11,7 @@ export async function NewObjectCommand() {
     let extension = await service.getExtension(workspaceUri);
     if (extension === null) {
         showErrorMessage('Extension is not initialized, use the initialize command first!'); // XXX add shortcut button for initialization
-        return
+        return;
     }
 
     let objectType = await promptObjectSelection();
@@ -22,7 +22,7 @@ export async function NewObjectCommand() {
     let snippetFileContent = readSnippetFile(objectType);
 
     // XXX add max 30 char validation to input
-    let objectName = await getUserInput(`Enter ${objectType} name`);
+    let objectName = await getUserInput(`Enter ${ObjectType[objectType]} name`);
     if (objectName === undefined)
         return; // canceled
 
@@ -36,16 +36,15 @@ export async function NewObjectCommand() {
         return;
     }
 
-    await createObjectFile(workspaceUri, snippetFileContent, objectType, objectName, newObjectId);
+    await createObjectFile(snippetFileContent, objectType, objectName, newObjectId);
 }
 
 async function promptObjectSelection(): Promise<ObjectType | undefined> {
     let items: string[] = [];
 
-    // https://stackoverflow.com/questions/47896885/iterate-on-string-enum
-    const keys: (keyof typeof ObjectType)[] = <(keyof typeof ObjectType)[]>Object.keys(ObjectType);
-    for (const key of keys) {
-        items.push(ObjectType[key]);
+    for (const value of Object.values(ObjectType)) {
+        if (typeof value === 'string')
+            items.push(value);
     }
     let selection = await getUserSelection(items);
     if (selection === undefined)
@@ -55,15 +54,11 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
 }
 
 async function createObjectFile(
-    workspaceUri: vscode.Uri,
     snippetFileContent: Buffer,
     objectType: ObjectType,
     objectName: string,
     objectId: number,
 ) {
-    // const newFileUri = vscode.Uri.parse(join('untitled:', getCurrentWorkspace(), '.al'));
-
-    // let textDocument = await vscode.workspace.openTextDocument(newFileUri);
     let textDocument = await vscode.workspace.openTextDocument({
         language: 'al',
     });
