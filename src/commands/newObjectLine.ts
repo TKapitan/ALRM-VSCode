@@ -11,29 +11,33 @@ interface FileInfo {
 }
 
 export async function NewObjectLineCommand() {
-    let workspaceUri = getCurrentWorkspaceUri();
+    try {
+        let workspaceUri = getCurrentWorkspaceUri();
 
-    let currentFileContent = readCurrentFile(); // XXX check if current file in workspaceUri
-    if (!currentFileContent) {
-        showErrorMessage('No file open!');
-        return;
+        let currentFileContent = readCurrentFile(); // XXX check if current file in workspaceUri
+        if (!currentFileContent) {
+            showErrorMessage('No file open!');
+            return;
+        }
+
+        let fileInfo = checkFileType(currentFileContent);
+
+        let service = new ExtensionService();
+        let extension = await service.getExtension(workspaceUri);
+        if (extension === null) {
+            promptInitialization();
+            return;
+        }
+
+        let newLineId = await service.createExtensionObjectLine(extension, {
+            objectType: fileInfo.objectType.toString(),
+            objectID: fileInfo.objectId,
+        });
+
+        await insertNewLine(fileInfo.objectType, newLineId);
+    } catch (error) {
+        showErrorMessage(error);
     }
-
-    let fileInfo = checkFileType(currentFileContent);
-
-    let service = new ExtensionService();
-    let extension = await service.getExtension(workspaceUri);
-    if (extension === null) {
-        promptInitialization();
-        return;
-    }
-
-    let newLineId = await service.createExtensionObjectLine(extension, {
-        objectType: fileInfo.objectType.toString(),
-        objectID: fileInfo.objectId,
-    });
-
-    await insertNewLine(fileInfo.objectType, newLineId);
 }
 
 function checkFileType(fileContent: string): FileInfo {

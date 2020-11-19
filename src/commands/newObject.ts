@@ -5,37 +5,41 @@ import { ExtensionService } from '../services/extensionService';
 import { getCurrentWorkspaceUri, readSnippetFile } from '../services/fileService';
 
 export async function NewObjectCommand() {
-    let workspaceUri = getCurrentWorkspaceUri();
-    let service = new ExtensionService();
+    try {
+        let workspaceUri = getCurrentWorkspaceUri();
+        let service = new ExtensionService();
 
-    let extension = await service.getExtension(workspaceUri);
-    if (extension === null) {
-        promptInitialization();
-        return;
+        let extension = await service.getExtension(workspaceUri);
+        if (extension === null) {
+            promptInitialization();
+            return;
+        }
+
+        let objectType = await promptObjectSelection();
+        if (objectType === undefined)
+            return; // canceled
+
+        let snippetFileContent = readSnippetFile(objectType);
+
+        // XXX add max 30 char validation to input
+        let objectName = await getUserInput(`Enter ${ObjectType[objectType]} name`);
+        if (objectName === undefined)
+            return; // canceled
+
+        let newObjectId = await service.createExtensionObject(extension, {
+            objectType: getObjectTypeNumber(objectType).toString(),
+            objectName: objectName,
+            createdBy: '',
+        });
+        if (newObjectId === null) {
+            showErrorMessage('New object could not be created!');
+            return;
+        }
+
+        await createObjectFile(snippetFileContent, objectType, objectName, newObjectId);
+    } catch (error) {
+        showErrorMessage(error);
     }
-
-    let objectType = await promptObjectSelection();
-    if (objectType === undefined)
-        return; // canceled
-
-    let snippetFileContent = readSnippetFile(objectType);
-
-    // XXX add max 30 char validation to input
-    let objectName = await getUserInput(`Enter ${ObjectType[objectType]} name`);
-    if (objectName === undefined)
-        return; // canceled
-
-    let newObjectId = await service.createExtensionObject(extension, {
-        objectType: getObjectTypeNumber(objectType).toString(),
-        objectName: objectName,
-        createdBy: '',
-    });
-    if (newObjectId === null) {
-        showErrorMessage('New object could not be created!');
-        return;
-    }
-
-    await createObjectFile(snippetFileContent, objectType, objectName, newObjectId);
 }
 
 async function promptObjectSelection(): Promise<ObjectType | undefined> {
@@ -109,6 +113,7 @@ function substituteObjectInfo(
             return snippetHeader
                 .replace('${1:id}', objectId)
                 .replace('${2:MyEnum}', `"${objectName}"`);
+        // XXX default enum extension snippet contains value snippet
         case ObjectType.EnumExtension:
             return snippetHeader
                 .replace('${1:Id}', objectId)
