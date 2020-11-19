@@ -18,15 +18,11 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let disposables =
 		[
-			vscode.commands.registerCommand('al-id-range-manager.helloWorld', () => {
-				vscode.window.showInformationMessage('Hello World from AL Id Range Manager!');
-			}),
 			vscode.commands.registerCommand('al-id-range-manager.initialize', InitiliazeCommand),
 			vscode.commands.registerCommand('al-id-range-manager.newObject', NewObjectCommand),
-			vscode.commands.registerCommand('al-id-range-manager.test', tmp.tmp)
 		];
 
-	context.subscriptions.concat(disposables);
+	context.subscriptions.push(...disposables);
 }
 
 // this method is called when your extension is deactivated
