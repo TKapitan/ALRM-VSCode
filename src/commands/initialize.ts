@@ -1,8 +1,8 @@
 import { readAppJson, getCurrentWorkspaceUri } from "../services/fileService";
-import { ExtensionService } from "../services/extensionService";
+import ExtensionService from "../services/extensionService";
 import { showInformationMessage, showErrorMessage, getUserSelection } from "../helpers/userInteraction";
 
-export async function InitiliazeCommand() {
+export default async function InitiliazeCommand() {
     try {
         let workspaceUri = getCurrentWorkspaceUri();
 

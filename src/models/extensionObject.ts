@@ -1,3 +1,3 @@
-export class ExtensionObject {
+export default class ExtensionObject {
 
 }

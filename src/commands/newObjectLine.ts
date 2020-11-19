@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { promptInitialization, showErrorMessage } from "../helpers/userInteraction";
 import { ObjectType } from "../models/objectType";
-import { ExtensionService } from "../services/extensionService";
+import ExtensionService from "../services/extensionService";
 import { getCurrentWorkspaceUri, readCurrentFile } from "../services/fileService";
 
 interface FileInfo {
@@ -10,7 +10,7 @@ interface FileInfo {
     objectStartIndex: number,
 }
 
-export async function NewObjectLineCommand() {
+export default async function NewObjectLineCommand() {
     try {
         let workspaceUri = getCurrentWorkspaceUri();
 

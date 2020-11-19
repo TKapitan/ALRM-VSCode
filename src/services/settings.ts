@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 export const CONFIG_KEY: string = 'al-id-range-manager';
 
-export class Settings {
+export default class Settings {
     private apiBaseUrl?: string;
     private apiUsername?: string;
     private apiPassword?: string;

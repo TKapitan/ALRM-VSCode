@@ -1,7 +1,7 @@
 import { join } from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { App } from '../models/app';
+import App from '../models/app';
 import { ObjectType } from '../models/objectType';
 
 const AlLanguage: string = 'ms-dynamics-smb.al';

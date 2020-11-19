@@ -1,4 +1,4 @@
-export class Extension {
+export default class Extension {
     code: string;
     id: string;
 

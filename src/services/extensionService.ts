@@ -1,10 +1,10 @@
-import { BcClient, Resources } from "./bcClient";
+import BcClient, { Resources } from "./bcClient";
 import { readAppJson } from "./fileService";
-import { Extension } from '../models/extension';
-import { AssignableRange } from '../models/assignableRange';
+import Extension from '../models/extension';
+import AssignableRange from '../models/assignableRange';
 import * as vscode from 'vscode';
 
-export class ExtensionService {
+export default class ExtensionService {
     private static cache: Record<string, Extension> = {};
     private client: BcClient;
 

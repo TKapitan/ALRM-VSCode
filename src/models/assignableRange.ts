@@ -1,4 +1,4 @@
-export class AssignableRange {
+export default class AssignableRange {
     code: string;
 
     constructor(code: string) {

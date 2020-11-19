@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import { getUserInput, getUserSelection, promptInitialization, showErrorMessage } from '../helpers/userInteraction';
 import { ObjectType } from '../models/objectType';
-import { ExtensionService } from '../services/extensionService';
+import ExtensionService from '../services/extensionService';
 import { getCurrentWorkspaceUri, readSnippetFile } from '../services/fileService';
 
-export async function NewObjectCommand() {
+export default async function NewObjectCommand() {
     try {
         let workspaceUri = getCurrentWorkspaceUri();
         let service = new ExtensionService();
@@ -21,7 +21,7 @@ export async function NewObjectCommand() {
 
         let snippetFileContent = readSnippetFile(objectType);
 
-        // XXX add max 50 char validation to input
+        // XXX add max 30 char validation to input
         let objectName = await getUserInput(`Enter ${ObjectType[objectType]} name`);
         if (objectName === undefined)
             return; // canceled

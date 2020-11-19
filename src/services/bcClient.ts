@@ -1,5 +1,5 @@
 import axios, { Method, AxiosResponse } from 'axios';
-import { Settings } from './settings';
+import Settings from './settings';
 
 export class Resources {
     public static readonly Extension = 'extensions';
@@ -14,7 +14,7 @@ interface QueryParameters {
     filter?: string;
 }
 
-export class BcClient {
+export default class BcClient {
     private baseUrl: string;
 
     constructor() {
