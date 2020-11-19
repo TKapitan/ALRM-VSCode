@@ -88,7 +88,7 @@ function buildTableFieldSnippet(fieldId: number): vscode.SnippetString {
         `field(${fieldId}` +
         '; ${2:MyField}; ${3|Blob,BigInteger,Boolean,Code[50],Date,DateFormula,Decimal,Duration,Integer,Guid,Media,MediaSet,Option,RecordID,TableFilter,Text[50],Time|})\n' +
         '{\n' +
-        '\tCaption = \'${2:MyField}\';' +
+        '\tCaption = \'${2:MyField}\';\n' +
         '\tDataClassification = ${4|ToBeClassified,CustomerContent,EndUserIdentifiableInformation,AccountData,EndUserPseudonymousIdentifiers,OrganizationIdentifiableInformation,SystemMetadata|};\n' +
         '}\n'
     );
@@ -96,7 +96,7 @@ function buildTableFieldSnippet(fieldId: number): vscode.SnippetString {
 
 function buildEnumValueSnippet(valueId: number): vscode.SnippetString {
     return new vscode.SnippetString(
-        `value(${valueId}\n` +
+        `value(${valueId}` +
         '; ${0: MyValue})\n' +
         '{\n' +
         '}'
