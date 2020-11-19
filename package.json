@@ -49,7 +49,7 @@
 			},
 			{
 				"command": "al-id-range-manager.newObjectLine",
-				"title": "ALRM: New object line"
+				"title": "ALRM: New object extension field or value"
 			}
 		]
 	},
