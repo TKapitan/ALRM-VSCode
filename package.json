@@ -1,7 +1,7 @@
 {
 	"name": "al-id-range-manager",
-	"displayName": "AL Id Range Manager",
-	"description": "",
+	"displayName": "AL ID Range Manager",
+	"description": "Manage your object ids in Microsoft Business Central.",
 	"publisher": "art-aa-ae",
 	"version": "0.0.1",
 	"engines": {
@@ -19,7 +19,7 @@
 	"main": "./out/extension.js",
 	"contributes": {
 		"configuration": {
-			"title": "AL Id Range Manager",
+			"title": "AL ID Range Manager",
 			"properties": {
 				"al-id-range-manager.baseUrl": {
 					"type": "string",
