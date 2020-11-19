@@ -90,7 +90,7 @@ async function insertNewLine(
 function buildTableFieldSnippet(fieldId: number): vscode.SnippetString {
     return new vscode.SnippetString(
         `field(${fieldId}` +
-        '; ${2:MyField}; ${3|Blob,BigInteger,Boolean,Code[50],Date,DateFormula,Decimal,Duration,Integer,Guid,Media,MediaSet,Option,RecordID,TableFilter,Text[50],Time|})\n' +
+        '; "${2:MyField}"; ${3|Blob,BigInteger,Boolean,Code[50],Date,DateFormula,Decimal,Duration,Integer,Guid,Media,MediaSet,Option,RecordID,TableFilter,Text[50],Time|})\n' +
         '{\n' +
         '\tCaption = \'${2:MyField}\';\n' +
         '\tDataClassification = ${4|ToBeClassified,CustomerContent,EndUserIdentifiableInformation,AccountData,EndUserPseudonymousIdentifiers,OrganizationIdentifiableInformation,SystemMetadata|};\n' +
