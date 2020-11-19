@@ -26,12 +26,7 @@ export default async function InitiliazeCommand() {
         if (range === undefined)
             return; // canceled
 
-        extension = await service.createExtension(workspaceUri, app.id, {
-            id: app.id,
-            rangeCode: range,
-            name: app.name.substring(0, 50),
-            description: app.description.substr(0, 250),
-        });
+        extension = await service.createExtension(workspaceUri, app, range);
 
         showInformationMessage(`Successfully initialized extension ${extension.code}!`);
     } catch (error) {

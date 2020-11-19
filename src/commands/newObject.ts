@@ -26,11 +26,7 @@ export default async function NewObjectCommand() {
         if (objectName === undefined)
             return; // canceled
 
-        let newObjectId = await service.createExtensionObject(extension, {
-            objectType: objectType.toString(),
-            objectName: objectName,
-            createdBy: '',
-        });
+        let newObjectId = await service.createExtensionObject(extension, objectType, objectName);
         if (newObjectId === null) {
             showErrorMessage('New object could not be created!');
             return;

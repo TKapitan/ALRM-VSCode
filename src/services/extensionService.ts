@@ -3,6 +3,8 @@ import { readAppJson } from "./fileService";
 import Extension from '../models/extension';
 import AssignableRange from '../models/assignableRange';
 import * as vscode from 'vscode';
+import App from "../models/app";
+import { ObjectType } from "../models/objectType";
 
 export default class ExtensionService {
     private static cache: Record<string, Extension> = {};
@@ -26,14 +28,23 @@ export default class ExtensionService {
         return extension;
     }
 
-    public async createExtension(workspace: vscode.Uri, id: string, data: Object): Promise<Extension> {
-        let extension = await this.createBcExtension(data);
+    public async createExtension(workspace: vscode.Uri, app: App, rangeCode: string): Promise<Extension> {
+        let extension = await this.createBcExtension({
+            id: app.id,
+            rangeCode: rangeCode,
+            name: app.name.substring(0, 50),
+            description: app.description.substr(0, 250),
+        });
         ExtensionService.cache[workspace.fsPath] = extension;
         return extension;
     }
 
-    public async createExtensionObject(extension: Extension, data: Object): Promise<number> {
-        let response = await this.client.callAction(Resources.Extension, extension.code, 'createObject', data);
+    public async createExtensionObject(extension: Extension, objectType: ObjectType, objectName: string): Promise<number> {
+        let response = await this.client.callAction(Resources.Extension, extension.code, 'createObject', {
+            objectType: objectType.toString(),
+            objectName: objectName,
+            createdBy: '', // TODO
+        });
 
         let objectId = Number(response);
         if (isNaN(objectId))
@@ -41,13 +52,16 @@ export default class ExtensionService {
         return objectId;
     }
 
-    public async createExtensionObjectLine(extension: Extension, data: Object): Promise<number> {
-        let response = await this.client.callAction(Resources.Extension, extension.code, 'createObjectLine', data);
+    public async createExtensionObjectLine(extension: Extension, objectType: ObjectType, objectId: number): Promise<number> {
+        let response = await this.client.callAction(Resources.Extension, extension.code, 'createObjectLine', {
+            objectType: objectType.toString(),
+            objectID: objectId.toString(),
+        });
 
-        let objectId = Number(response);
-        if (isNaN(objectId))
+        let objectLineId = Number(response);
+        if (isNaN(objectLineId))
             throw new Error(`Unexpected object id response: ${response}`);
-        return objectId;
+        return objectLineId;
     }
 
 

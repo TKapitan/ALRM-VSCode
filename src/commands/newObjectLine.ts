@@ -29,11 +29,7 @@ export default async function NewObjectLineCommand() {
             return;
         }
 
-        let newLineId = await service.createExtensionObjectLine(extension, {
-            objectType: fileInfo.objectType.toString(),
-            objectID: fileInfo.objectId,
-        });
-
+        let newLineId = await service.createExtensionObjectLine(extension, fileInfo.objectType, fileInfo.objectId);
         await insertNewLine(fileInfo.objectType, newLineId);
     } catch (error) {
         showErrorMessage(error);
