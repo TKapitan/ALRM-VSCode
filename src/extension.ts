@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { InitiliazeCommand } from './commands/initialize';
 import { NewObjectCommand } from './commands/newObject';
-import * as tmp from './tmp';
+import { NewObjectLineCommand } from './commands/newObjectLine';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -20,6 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 		[
 			vscode.commands.registerCommand('al-id-range-manager.initialize', InitiliazeCommand),
 			vscode.commands.registerCommand('al-id-range-manager.newObject', NewObjectCommand),
+			vscode.commands.registerCommand('al-id-range-manager.newObjectLine', NewObjectLineCommand),
 		];
 
 	context.subscriptions.push(...disposables);

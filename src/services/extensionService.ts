@@ -41,6 +41,16 @@ export class ExtensionService {
         return objectId;
     }
 
+    public async createExtensionObjectLine(extension: Extension, data: Object): Promise<number> {
+        let response = await this.client.callAction(Resources.Extension, extension.code, 'createObjectLine', data);
+
+        let objectId = Number(response);
+        if (isNaN(objectId))
+            throw new Error(`Unexpected object id response: ${response}`);
+        return objectId;
+    }
+
+
     private async getBcExtension(id: string): Promise<Extension | null> {
         let extensions = await this.client.readMultiple(Resources.Extension, {
             top: 1,

@@ -18,7 +18,6 @@ export async function NewObjectCommand() {
     if (objectType === undefined)
         return; // canceled
 
-
     let snippetFileContent = readSnippetFile(objectType);
 
     // XXX add max 30 char validation to input

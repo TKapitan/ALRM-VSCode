@@ -24,8 +24,7 @@ export class BcClient {
         this.baseUrl = settings.ApiBaseUrl ?? '';
 
         let authorization: string = Buffer.from(`${settings.ApiUsername}:${settings.ApiPassword}`).toString('base64');
-        // TODO does not seem to work ? 
-        // axios.defaults.validateStatus = (status: number) => status >= 200 && status < 500;
+        axios.defaults.validateStatus = (status: number) => status >= 200 && status < 500;
         axios.defaults.headers.common['Authorization'] = `Basic ${authorization}`;
     }
 
@@ -122,8 +121,7 @@ export class BcClient {
         if (response.data === null)
             throw new Error('Empty response');
 
-        let errorResponse = response.data;
-        throw new Error(errorResponse.error);
+        throw new Error(response.data.error.message);
     }
 
     private buildUrl(

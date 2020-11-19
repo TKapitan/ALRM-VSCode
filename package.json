@@ -12,7 +12,8 @@
 	],
 	"activationEvents": [
 		"onCommand:al-id-range-manager.initialize",
-		"onCommand:al-id-range-manager.newObject"
+		"onCommand:al-id-range-manager.newObject",
+		"onCommand:al-id-range-manager.newObjectLine"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -22,17 +23,17 @@
 				"al-id-range-manager.baseUrl": {
 					"type": "string",
 					"default": "",
-					"description": "BC API base url (https://server:port/instance/api/...)"
+					"description": "Business Central API base url (https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/)"
 				},
 				"al-id-range-manager.username": {
 					"type": "string",
 					"default": "",
-					"description": "BC API username"
+					"description": "Business Central API username"
 				},
 				"al-id-range-manager.password": {
 					"type": "string",
 					"default": "",
-					"description": "BC API password"
+					"description": "Business Central API password"
 				}
 			}
 		},
@@ -44,6 +45,10 @@
 			{
 				"command": "al-id-range-manager.newObject",
 				"title": "ALRM: New object"
+			},
+			{
+				"command": "al-id-range-manager.newObjectLine",
+				"title": "ALRM: New object line"
 			}
 		]
 	},

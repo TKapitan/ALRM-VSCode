@@ -84,3 +84,7 @@ function objectTypeSnippetFileName(objectType: ObjectType): string {
             throw new Error(`Unimplemented type ${objectType}!`);
     }
 }
+
+export function readCurrentFile(): string | undefined {
+    return vscode.window.activeTextEditor?.document.getText();
+}
