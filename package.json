@@ -1,5 +1,5 @@
 {
-  "name": "al-id-range-manager",
+	"name": "al-id-range-manager",
 	"displayName": "AL Id Range Manager",
 	"description": "",
 	"version": "0.0.1",
@@ -10,14 +10,48 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:al-id-range-manager.helloWorld"
+		"onCommand:al-id-range-manager.initialize",
+		"onCommand:al-id-range-manager.newObject",
+		"onCommand:al-id-range-manager.test"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "AL Id Range Manager",
+			"properties": {
+				"al-id-range-manager.baseUrl": {
+					"type": "string",
+					"default": "",
+					"description": "BC API base url (https://server:port/instance/api/...)"
+				},
+				"al-id-range-manager.username": {
+					"type": "string",
+					"default": "",
+					"description": "BC API username"
+				},
+				"al-id-range-manager.password": {
+					"type": "string",
+					"default": "",
+					"description": "BC API password"
+				}
+			}
+		},
 		"commands": [
 			{
 				"command": "al-id-range-manager.helloWorld",
-				"title": "Hello World"
+				"title": "ALRM: Hello World"
+			},
+			{
+				"command": "al-id-range-manager.test",
+				"title": "ALRM: Test"
+			},
+			{
+				"command": "al-id-range-manager.initialize",
+				"title": "ALRM: Initialize"
+			},
+			{
+				"command": "al-id-range-manager.newObject",
+				"title": "ALRM: New object"
 			}
 		]
 	},
@@ -30,16 +64,17 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.51.0",
 		"@types/glob": "^7.1.3",
 		"@types/mocha": "^8.0.0",
 		"@types/node": "^12.11.7",
-		"eslint": "^7.9.0",
+		"@types/vscode": "^1.51.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
+		"eslint": "^7.9.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.3",
 		"typescript": "^4.0.2",
 		"vscode-test": "^1.4.0"
-	}
+	},
+	"dependencies": {}
 }
