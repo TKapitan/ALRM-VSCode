@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export enum ObjectType {
     Table = 5,
     TableExtension = 6,

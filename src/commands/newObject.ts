@@ -4,29 +4,31 @@ import { ObjectType } from '../models/objectType';
 import ExtensionService from '../services/extensionService';
 import { getCurrentWorkspaceUri, readSnippetFile } from '../services/fileService';
 
-export default async function NewObjectCommand() {
+export default async function newObjectCommand(): Promise<void> {
     try {
-        let workspaceUri = getCurrentWorkspaceUri();
-        let service = new ExtensionService();
+        const workspaceUri = getCurrentWorkspaceUri();
+        const service = new ExtensionService();
 
-        let extension = await service.getExtension(workspaceUri);
+        const extension = await service.getExtension(workspaceUri);
         if (extension === null) {
             promptInitialization();
             return;
         }
 
-        let objectType = await promptObjectSelection();
-        if (objectType === undefined)
+        const objectType = await promptObjectSelection();
+        if (objectType === undefined){
             return; // canceled
+        }
 
-        let snippetFileContent = readSnippetFile(objectType);
+        const snippetFileContent = readSnippetFile(objectType);
 
         // XXX add max 30 char validation to input
-        let objectName = await getUserInput(`Enter ${ObjectType[objectType]} name`);
-        if (objectName === undefined)
+        const objectName = await getUserInput(`Enter ${ObjectType[objectType]} name`);
+        if (objectName === undefined){
             return; // canceled
+        }
 
-        let newObjectId = await service.createExtensionObject(extension, objectType, objectName);
+        const newObjectId = await service.createExtensionObject(extension, objectType, objectName);
         if (newObjectId === null) {
             showErrorMessage('New object could not be created!');
             return;
@@ -39,15 +41,17 @@ export default async function NewObjectCommand() {
 }
 
 async function promptObjectSelection(): Promise<ObjectType | undefined> {
-    let items: string[] = [];
+    const items: string[] = [];
 
     for (const value of Object.values(ObjectType)) {
-        if (typeof value === 'string')
+        if (typeof value === 'string'){
             items.push(value);
+        }
     }
-    let selection = await getUserSelection(items);
-    if (selection === undefined)
+    const selection = await getUserSelection(items);
+    if (selection === undefined){
         return undefined;
+    }
 
     return ObjectType[selection as keyof typeof ObjectType];
 }
@@ -58,13 +62,13 @@ async function createObjectFile(
     objectName: string,
     objectId: number,
 ) {
-    let textDocument = await vscode.workspace.openTextDocument({
+    const textDocument = await vscode.workspace.openTextDocument({
         language: 'al',
     });
 
-    let snippet = buildObjectSnippet(snippetFileContent, objectType, objectName, objectId);
+    const snippet = buildObjectSnippet(snippetFileContent, objectType, objectName, objectId);
 
-    let textEditor = await vscode.window.showTextDocument(textDocument);
+    const textEditor = await vscode.window.showTextDocument(textDocument);
     textEditor.insertSnippet(snippet);
 }
 
@@ -75,20 +79,23 @@ function buildObjectSnippet(
     objectId: number,
 ): vscode.SnippetString {
     let snippetObject = JSON.parse(snippetFileContent.toString());
-    if (typeof snippetObject !== 'object')
+    if (typeof snippetObject !== 'object'){
         throw new Error('Incorrect snippet file format!');
+    }
 
-    if (Object.keys(snippetObject).length === 0)
+    if (Object.keys(snippetObject).length === 0){
         throw new Error('Incorrect snippet file format!');
+    }
 
     snippetObject = snippetObject[Object.keys(snippetObject)[0]];
-    if (!('body' in snippetObject) || !Array.isArray(snippetObject['body']))
+    if (!('body' in snippetObject) || !Array.isArray(snippetObject['body'])){
         throw new Error('Incorrect snippet file format!');
+    }
 
-    let snippetLines = snippetObject['body'];
+    const snippetLines = snippetObject['body'];
 
     snippetLines[0] = substituteObjectInfo(snippetLines[0], objectType, objectName, objectId.toString());
-    let snippetString = new vscode.SnippetString(snippetLines.join('\n'));
+    const snippetString = new vscode.SnippetString(snippetLines.join('\n'));
 
     return snippetString;
 

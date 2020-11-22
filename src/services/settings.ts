@@ -1,32 +1,32 @@
 import * as vscode from 'vscode';
 
-export const CONFIG_KEY: string = 'al-id-range-manager';
+export const CONFIG_KEY = 'al-id-range-manager';
 
 export default class Settings {
-    private apiBaseUrl?: string;
-    private apiUsername?: string;
-    private apiPassword?: string;
+    private _apiBaseUrl?: string;
+    private _apiUsername?: string;
+    private _apiPassword?: string;
 
-    public get ApiBaseUrl() { return this.apiBaseUrl; }
-    public get ApiUsername() { return this.apiUsername; }
-    public get ApiPassword() { return this.apiPassword; }
+    public get apiBaseUrl() :string { return this._apiBaseUrl || ''; }
+    public get apiUsername() :string { return this._apiUsername || ''; }
+    public get apiPassword() :string { return this._apiPassword || ''; }
 
     constructor() {
         this.parseConfig();
     }
 
     private parseConfig() {
-        let config = vscode.workspace.getConfiguration(CONFIG_KEY);
+        const config = vscode.workspace.getConfiguration(CONFIG_KEY);
 
-        this.apiBaseUrl = config.get('baseUrl');
-        this.apiUsername = config.get('username');
-        this.apiPassword = config.get('password');
+        this._apiBaseUrl = config.get('baseUrl');
+        this._apiUsername = config.get('username');
+        this._apiPassword = config.get('password');
     }
 
     public validate(): boolean {
-        if ((this.ApiBaseUrl ?? '') === '' || (this.ApiUsername ?? '') === '' || (this.ApiPassword ?? '') === '')
+        if (this.apiBaseUrl === '' || this.apiUsername === '' || this.apiPassword === ''){
             return false;
-
+        }
         return true;
     }
 }

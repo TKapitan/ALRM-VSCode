@@ -15,21 +15,21 @@ export default class ExtensionService {
     }
 
     public async getExtension(workspace: vscode.Uri): Promise<Extension | null> {
-        if (workspace.fsPath in ExtensionService.cache)
+        if (workspace.fsPath in ExtensionService.cache){
             return ExtensionService.cache[workspace.fsPath];
+        }
+        const app = readAppJson(workspace);
 
-        let app = readAppJson(workspace);
-
-        let extension = await this.getBcExtension(app.id);
-        if (extension === null)
+        const extension = await this.getBcExtension(app.id);
+        if (extension === null){
             return null;
-
+        }
         ExtensionService.cache[workspace.fsPath] = extension;
         return extension;
     }
 
     public async createExtension(workspace: vscode.Uri, app: App, rangeCode: string): Promise<Extension> {
-        let extension = await this.createBcExtension({
+        const extension = await this.createBcExtension({
             id: app.id,
             rangeCode: rangeCode,
             name: app.name.substring(0, 50),
@@ -40,51 +40,53 @@ export default class ExtensionService {
     }
 
     public async createExtensionObject(extension: Extension, objectType: ObjectType, objectName: string): Promise<number> {
-        let response = await this.client.callAction(Resources.Extension, extension.code, 'createObject', {
+        const response = await this.client.callAction(Resources.extension, extension.code, 'createObject', {
             objectType: objectType.toString(),
             objectName: objectName,
             createdBy: this.client.username?.substr(0, 50) ?? '',
         });
 
-        let objectId = Number(response);
-        if (isNaN(objectId))
+        const objectId = Number(response);
+        if (isNaN(objectId)){
             throw new Error(`Unexpected object id response: ${response}`);
+        }
         return objectId;
     }
 
     public async createExtensionObjectLine(extension: Extension, objectType: ObjectType, objectId: number): Promise<number> {
-        let response = await this.client.callAction(Resources.Extension, extension.code, 'createObjectLine', {
+        const response = await this.client.callAction(Resources.extension, extension.code, 'createObjectLine', {
             objectType: objectType.toString(),
             objectID: objectId.toString(),
         });
 
-        let objectLineId = Number(response);
-        if (isNaN(objectLineId))
+        const objectLineId = Number(response);
+        if (isNaN(objectLineId)){
             throw new Error(`Unexpected object id response: ${response}`);
+        }
         return objectLineId;
     }
 
-
     private async getBcExtension(id: string): Promise<Extension | null> {
-        let extensions = await this.client.readMultiple(Resources.Extension, {
+        const extensions = await this.client.readMultiple(Resources.extension, {
             top: 1,
             filter: `id eq ${id}`
         });
 
-        if (extensions.length === 0)
+        if (extensions.length === 0){
             return null;
+        }
 
         return Extension.fromJson(extensions[0]);
     }
 
     private async createBcExtension(data: Object): Promise<Extension> {
-        let extension = await this.client.create(Resources.Extension, data);
+        const extension = await this.client.create(Resources.extension, data);
 
         return Extension.fromJson(extension);
     }
 
     public async getAllAssignableRanges(): Promise<AssignableRange[]> {
-        let assignableRanges = await this.client.readAll(Resources.AssignableRange);
+        const assignableRanges = await this.client.readAll(Resources.assignableRange);
 
         return assignableRanges.map(e => AssignableRange.fromJson(e));
     }

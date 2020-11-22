@@ -10,26 +10,26 @@ interface FileInfo {
     objectStartIndex: number,
 }
 
-export default async function NewObjectLineCommand() {
+export default async function newObjectLineCommand(): Promise<void> {
     try {
-        let workspaceUri = getCurrentWorkspaceUri();
+        const workspaceUri = getCurrentWorkspaceUri();
 
-        let currentFileContent = readCurrentFile(); // XXX check if current file in workspaceUri
+        const currentFileContent = readCurrentFile(); // XXX check if current file in workspaceUri
         if (!currentFileContent) {
             showErrorMessage('No file open!');
             return;
         }
 
-        let fileInfo = checkFileType(currentFileContent);
+        const fileInfo = checkFileType(currentFileContent);
 
-        let service = new ExtensionService();
-        let extension = await service.getExtension(workspaceUri);
+        const service = new ExtensionService();
+        const extension = await service.getExtension(workspaceUri);
         if (extension === null) {
             promptInitialization();
             return;
         }
 
-        let newLineId = await service.createExtensionObjectLine(extension, fileInfo.objectType, fileInfo.objectId);
+        const newLineId = await service.createExtensionObjectLine(extension, fileInfo.objectType, fileInfo.objectId);
         await insertNewLine(fileInfo.objectType, newLineId);
     } catch (error) {
         showErrorMessage(error);
@@ -37,10 +37,11 @@ export default async function NewObjectLineCommand() {
 }
 
 function checkFileType(fileContent: string): FileInfo {
-    let re = /(tableextension|enumextension) (\d+) ".*" extends/gm;
-    let match = re.exec(fileContent);
-    if (!match || match.length != 3)
+    const re = /(tableextension|enumextension) (\d+) ".*" extends/gm;
+    const match = re.exec(fileContent);
+    if (!match || match.length !== 3){
         throw new Error('Unsupported file type!');
+    }
 
     let objectType: ObjectType;
     switch (match[1]) {
@@ -54,10 +55,10 @@ function checkFileType(fileContent: string): FileInfo {
             throw new Error('Unsupported file type!');
     }
 
-    let objectId = Number(match[2]);
-    if (isNaN(objectId))
+    const objectId = Number(match[2]);
+    if (isNaN(objectId)){
         throw new Error('Unsupported file type!');
-
+    }
     return {
         objectType: objectType,
         objectId: objectId,

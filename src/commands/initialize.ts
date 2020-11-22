@@ -2,15 +2,14 @@ import { readAppJson, getCurrentWorkspaceUri } from "../services/fileService";
 import ExtensionService from "../services/extensionService";
 import { showInformationMessage, showErrorMessage, getUserSelection } from "../helpers/userInteraction";
 
-export default async function InitiliazeCommand() {
+export default async function initiliazeCommand() : Promise<void>{
     try {
-        let workspaceUri = getCurrentWorkspaceUri();
-
-        let app = readAppJson(workspaceUri);
-        if (app === null || app.id === '')
+        const workspaceUri = getCurrentWorkspaceUri();
+        const app = readAppJson(workspaceUri);
+        if (app === null || app.id === ''){
             throw new Error('Valid app.json not found!');
-
-        let service = new ExtensionService();
+        }
+        const service = new ExtensionService();
         let extension = await service.getExtension(workspaceUri);
         if (extension !== null) {
             showInformationMessage(`Existing extension ${extension.code} found!`);
@@ -19,12 +18,13 @@ export default async function InitiliazeCommand() {
         }
 
         // XXX add range min/max to API
-        let assignableRanges = await service.getAllAssignableRanges();
+        const assignableRanges = await service.getAllAssignableRanges();
         // XXX then edit app.json ranges
 
-        let range = await getUserSelection(assignableRanges.map(e => e.code));
-        if (range === undefined)
+        const range = await getUserSelection(assignableRanges.map(e => e.code));
+        if (range === undefined){
             return; // canceled
+        }
 
         extension = await service.createExtension(workspaceUri, app, range);
 
