@@ -16,7 +16,7 @@ export default async function newObjectCommand(): Promise<void> {
         }
 
         const objectType = await promptObjectSelection();
-        if (objectType === undefined){
+        if (objectType === undefined) {
             return; // canceled
         }
 
@@ -24,7 +24,7 @@ export default async function newObjectCommand(): Promise<void> {
 
         // XXX add max 30 char validation to input
         const objectName = await getUserInput(`Enter ${ObjectType[objectType]} name`);
-        if (objectName === undefined){
+        if (objectName === undefined) {
             return; // canceled
         }
 
@@ -44,12 +44,12 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
     const items: string[] = [];
 
     for (const value of Object.values(ObjectType)) {
-        if (typeof value === 'string'){
+        if (typeof value === 'string') {
             items.push(value);
         }
     }
     const selection = await getUserSelection(items);
-    if (selection === undefined){
+    if (selection === undefined) {
         return undefined;
     }
 
@@ -79,16 +79,16 @@ function buildObjectSnippet(
     objectId: number,
 ): vscode.SnippetString {
     let snippetObject = JSON.parse(snippetFileContent.toString());
-    if (typeof snippetObject !== 'object'){
+    if (typeof snippetObject !== 'object') {
         throw new Error('Incorrect snippet file format!');
     }
 
-    if (Object.keys(snippetObject).length === 0){
+    if (Object.keys(snippetObject).length === 0) {
         throw new Error('Incorrect snippet file format!');
     }
 
     snippetObject = snippetObject[Object.keys(snippetObject)[0]];
-    if (!('body' in snippetObject) || !Array.isArray(snippetObject['body'])){
+    if (!('body' in snippetObject) || !Array.isArray(snippetObject['body'])) {
         throw new Error('Incorrect snippet file format!');
     }
 

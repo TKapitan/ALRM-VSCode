@@ -30,19 +30,19 @@ export default class BcClient {
     }
 
     private validateSettings(settings: Settings) {
-        if (!settings.validate()){
+        if (!settings.validate()) {
             throw new Error('Provide api url, name and password in settings!');
         }
     }
 
-    public get username() : string {
+    public get username(): string {
         return this.settings.apiUsername;
     }
 
     public async read(resource: string, id: string): Promise<Object> {
         const response = await this.sendRequest('GET', this.buildUrl(resource, id));
 
-        if (response.data === null || typeof response.data !== 'object'){
+        if (response.data === null || typeof response.data !== 'object') {
             throw new Error(`Unexpected return type: ${typeof response.data}`);
         }
         return response.data;
@@ -51,10 +51,10 @@ export default class BcClient {
     public async readMultiple(resource: string, parameters?: QueryParameters): Promise<any[]> {
         const response = await this.sendRequest('GET', this.buildUrl(resource, undefined, undefined, parameters));
 
-        if (response.data === null || typeof response.data !== 'object'){
+        if (response.data === null || typeof response.data !== 'object') {
             throw new Error(`Unexpected return type: ${typeof response.data}`);
         }
-        if ('value' in response.data && Array.isArray(response.data['value'])){
+        if ('value' in response.data && Array.isArray(response.data['value'])) {
             return response.data['value'];
         }
         throw new Error(`Unexpected return type: ${typeof response.data['value']}`);
@@ -75,7 +75,7 @@ export default class BcClient {
             });
 
             result.push(...response);
-            if (response.length < querySize){
+            if (response.length < querySize) {
                 break;
             }
             offset += querySize;
@@ -86,7 +86,7 @@ export default class BcClient {
     public async create(resource: string, data: Object): Promise<Object> {
         const response = await this.sendRequest('POST', this.buildUrl(resource), data);
 
-        if (response.data === null || typeof response.data !== 'object'){
+        if (response.data === null || typeof response.data !== 'object') {
             throw new Error(`Unexpected return type: ${typeof response.data}`);
         }
         return response.data;
@@ -100,10 +100,10 @@ export default class BcClient {
     ): Promise<Object> {
         const response = await this.sendRequest('POST', this.buildUrl(resource, id, actionName), data);
 
-        if (response.data === null || typeof response.data !== 'object'){
+        if (response.data === null || typeof response.data !== 'object') {
             throw new Error(`Unexpected return type: ${typeof response.data}`);
         }
-        if ('value' in response.data){
+        if ('value' in response.data) {
             return response.data['value'];
         }
         throw new Error(`Unexpected response format:\n${response.data}`);
@@ -121,10 +121,10 @@ export default class BcClient {
             validateStatus: (status: number) => status >= 200 && status < 500,
         });
 
-        if (response.status >= 200 && response.status < 300){
+        if (response.status >= 200 && response.status < 300) {
             return response;
         }
-        if (response.data === null){
+        if (response.data === null) {
             throw new Error('Empty response');
         }
         throw new Error(response.data.error.message); // TODO if message is null -> show status & statusText (for example 404/Not Found)
@@ -137,31 +137,31 @@ export default class BcClient {
         queryParameters?: QueryParameters,
     ): string {
         let url: string = this.baseUrl;
-        if (!url.endsWith('/')){
+        if (!url.endsWith('/')) {
             url += '/';
         }
 
         url += resource;
-        if (id !== undefined){
+        if (id !== undefined) {
             url += `('${id}')`;
         }
-        if (actionName !== undefined){
+        if (actionName !== undefined) {
             url += `/Microsoft.NAV.${actionName}`;
         }
 
         if (queryParameters !== undefined) {
             const parameters: string[] = [];
-            if (queryParameters.top !== undefined){
+            if (queryParameters.top !== undefined) {
                 parameters.push(`$top=${queryParameters.top}`);
             }
-            if (queryParameters.skip !== undefined){
+            if (queryParameters.skip !== undefined) {
                 parameters.push(`$skip=${queryParameters.skip}`);
             }
-            if (queryParameters.filter !== undefined){
+            if (queryParameters.filter !== undefined) {
                 parameters.push(`$filter=${queryParameters.filter}`);
             }
 
-            if (parameters.length !== 0){
+            if (parameters.length !== 0) {
                 url += '?' + parameters.join('&');
             }
         }

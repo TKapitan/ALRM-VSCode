@@ -20,6 +20,6 @@ export function activate(context: vscode.ExtensionContext): void {
 	context.subscriptions.push(...disposables);
 }
 
-export function deactivate(): void { 
+export function deactivate(): void {
 	throw new Error('Not implemented yet!');
 }

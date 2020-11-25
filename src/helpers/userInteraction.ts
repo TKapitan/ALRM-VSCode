@@ -11,13 +11,13 @@ export async function showWarningMessage(message: string, items?: string[]): Pro
 
 export async function showErrorMessage(error: unknown, items?: string[]): Promise<string | undefined> {
     let errorMessage: string;
-    if (typeof error === 'string'){
+    if (typeof error === 'string') {
         errorMessage = error;
-    } else if (typeof error === 'object' && error instanceof Error){
+    } else if (typeof error === 'object' && error instanceof Error) {
         errorMessage = error.message;
-    } else if (typeof error === 'object'){
+    } else if (typeof error === 'object') {
         errorMessage = error?.toString() || '';
-    } else{
+    } else {
         errorMessage = error + '';
     }
     return await vscode.window.showErrorMessage(errorMessage, ...(items ?? []));
@@ -31,17 +31,17 @@ export async function getUserSelection(items: string[]): Promise<string | undefi
     return await vscode.window.showQuickPick(items);
 }
 
-export async function promptInitialization():Promise<void> {
+export async function promptInitialization(): Promise<void> {
     const initializeAction = 'Initialize';
 
     const result = await showErrorMessage('Extension is not initialized', [initializeAction]);
-    if (result === initializeAction){
+    if (result === initializeAction) {
         vscode.commands.executeCommand('al-id-range-manager.initialize'); // XXX create a dict
     }
 }
 
 
-export async function promptMissingSettings():Promise<void> {
+export async function promptMissingSettings(): Promise<void> {
     const openSettingsAction = 'Open Settings';
 
     const result = await showWarningMessage('Connection info is missing', [openSettingsAction]);

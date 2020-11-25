@@ -39,7 +39,7 @@ export default async function newObjectLineCommand(): Promise<void> {
 function checkFileType(fileContent: string): FileInfo {
     const re = /(tableextension|enumextension) (\d+) ".*" extends/gm;
     const match = re.exec(fileContent);
-    if (!match || match.length !== 3){
+    if (!match || match.length !== 3) {
         throw new Error('Unsupported file type!');
     }
 
@@ -56,7 +56,7 @@ function checkFileType(fileContent: string): FileInfo {
     }
 
     const objectId = Number(match[2]);
-    if (isNaN(objectId)){
+    if (isNaN(objectId)) {
         throw new Error('Unsupported file type!');
     }
     return {
