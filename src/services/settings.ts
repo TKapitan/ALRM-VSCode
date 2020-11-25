@@ -6,13 +6,19 @@ export default class Settings {
     private _apiBaseUrl?: string;
     private _apiUsername?: string;
     private _apiPassword?: string;
+    private static _instance: Settings;
 
     public get apiBaseUrl() :string { return this._apiBaseUrl || ''; }
     public get apiUsername() :string { return this._apiUsername || ''; }
     public get apiPassword() :string { return this._apiPassword || ''; }
 
-    constructor() {
+    private constructor() {
         this.parseConfig();
+    }
+
+    public static get instance(): Settings
+    {
+        return this._instance || (this._instance = new this());
     }
 
     private parseConfig() {

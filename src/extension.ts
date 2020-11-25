@@ -6,7 +6,7 @@ import { promptMissingSettings } from './helpers/userInteraction';
 import Settings from './services/settings';
 
 export function activate(context: vscode.ExtensionContext): void {
-	const settings = new Settings();
+	const settings = Settings.instance;
 	if (!settings.validate()) {
 		promptMissingSettings();
 	}

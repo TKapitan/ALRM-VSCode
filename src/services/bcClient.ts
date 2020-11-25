@@ -19,7 +19,7 @@ export default class BcClient {
     private settings: Settings;
 
     constructor() {
-        this.settings = new Settings();
+        this.settings = Settings.instance;
         this.validateSettings(this.settings);
 
         this.baseUrl = this.settings.apiBaseUrl ?? '';
