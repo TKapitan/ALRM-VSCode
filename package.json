@@ -35,6 +35,15 @@
           "type": "string",
           "default": "",
           "description": "Business Central API password"
+        },
+        "al-id-range-manager.assignableRange": {
+          "type": "string",
+          "enum": [
+            "API",
+            "Do Not Use"
+          ],
+          "default": "API",
+          "description": "Use the First Assignable Range"
         }
       }
     },

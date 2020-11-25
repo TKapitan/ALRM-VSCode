@@ -15,26 +15,35 @@ export default class ExtensionService {
     }
 
     public async getExtension(workspace: vscode.Uri): Promise<Extension | null> {
-        if (workspace.fsPath in ExtensionService.cache){
+        if (workspace.fsPath in ExtensionService.cache) {
             return ExtensionService.cache[workspace.fsPath];
         }
         const app = readAppJson(workspace);
 
         const extension = await this.getBcExtension(app.id);
-        if (extension === null){
+        if (extension === null) {
             return null;
         }
         ExtensionService.cache[workspace.fsPath] = extension;
         return extension;
     }
 
-    public async createExtension(workspace: vscode.Uri, app: App, rangeCode: string): Promise<Extension> {
-        const extension = await this.createBcExtension({
-            id: app.id,
-            rangeCode: rangeCode,
-            name: app.name.substring(0, 50),
-            description: app.description.substr(0, 250),
-        });
+    public async createExtension(workspace: vscode.Uri, app: App, rangeCode?: string): Promise<Extension> {
+        let extension;
+        if (rangeCode === null) {
+            extension = await this.createBcExtension({
+                id: app.id,
+                name: app.name.substring(0, 50),
+                description: app.description.substr(0, 250),
+            });
+        } else {
+            extension = await this.createBcExtension({
+                id: app.id,
+                rangeCode: rangeCode,
+                name: app.name.substring(0, 50),
+                description: app.description.substr(0, 250),
+            });
+        }
         ExtensionService.cache[workspace.fsPath] = extension;
         return extension;
     }
@@ -47,7 +56,7 @@ export default class ExtensionService {
         });
 
         const objectId = Number(response);
-        if (isNaN(objectId)){
+        if (isNaN(objectId)) {
             throw new Error(`Unexpected object id response: ${response}`);
         }
         return objectId;
@@ -60,7 +69,7 @@ export default class ExtensionService {
         });
 
         const objectLineId = Number(response);
-        if (isNaN(objectLineId)){
+        if (isNaN(objectLineId)) {
             throw new Error(`Unexpected object id response: ${response}`);
         }
         return objectLineId;
@@ -72,7 +81,7 @@ export default class ExtensionService {
             filter: `id eq ${id}`
         });
 
-        if (extensions.length === 0){
+        if (extensions.length === 0) {
             return null;
         }
 
