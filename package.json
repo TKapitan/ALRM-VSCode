@@ -24,17 +24,17 @@
         "al-id-range-manager.baseUrl": {
           "type": "string",
           "default": "",
-          "description": "Business Central API base url (https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/)"
+          "description": "API Base URL (for the Business Central API: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/)"
         },
         "al-id-range-manager.username": {
           "type": "string",
           "default": "",
-          "description": "Business Central API username"
+          "description": "API username"
         },
         "al-id-range-manager.password": {
           "type": "string",
           "default": "",
-          "description": "Business Central API password"
+          "description": "API password"
         },
         "al-id-range-manager.assignableRange": {
           "type": "string",
