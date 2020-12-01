@@ -1,17 +1,20 @@
 import * as vscode from 'vscode';
 
 export const CONFIG_KEY = 'al-id-range-manager';
+export const AUTH_TYPE_BASIC = 'Basic';
 
 export default class Settings {
     private _apiBaseUrl?: string;
     private _apiUsername?: string;
     private _apiPassword?: string;
+    private _authenticationType?: string;
     private _useAssignableRange?: boolean;
     private static _instance: Settings;
 
     public get apiBaseUrl(): string { return this._apiBaseUrl || ''; }
     public get apiUsername(): string { return this._apiUsername || ''; }
     public get apiPassword(): string { return this._apiPassword || ''; }
+    public get authenticationType(): string { return this._authenticationType || ''; }
     public get useAssignableRange(): boolean { return this._useAssignableRange || false; }
 
     private constructor() {
@@ -28,6 +31,7 @@ export default class Settings {
         this._apiBaseUrl = config.get('baseUrl');
         this._apiUsername = config.get('username');
         this._apiPassword = config.get('password');
+        this._authenticationType = config.get('authenticationType');
         this._useAssignableRange = false;
         if (config.get('assignableRange') === 'API') {
             this._useAssignableRange = true;

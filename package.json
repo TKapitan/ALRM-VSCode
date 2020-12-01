@@ -26,6 +26,14 @@
           "default": "",
           "description": "API Base URL (for the Business Central API: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/)"
         },
+        "al-id-range-manager.authenticationType": {
+          "type": "string",
+          "enum": [
+            "Basic"
+          ],
+          "default": "Basic",
+          "description": "API Authentication Type"
+        },
         "al-id-range-manager.username": {
           "type": "string",
           "default": "",

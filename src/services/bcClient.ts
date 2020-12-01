@@ -1,5 +1,5 @@
 import axios, { Method, AxiosResponse } from 'axios';
-import Settings from './settings';
+import Settings, { AUTH_TYPE_BASIC } from './settings';
 
 export class Resources {
     public static readonly extension = 'extensions';
@@ -23,10 +23,17 @@ export default class BcClient {
         this.validateSettings(this.settings);
 
         this.baseUrl = this.settings.apiBaseUrl ?? '';
-
-        const authorization: string = Buffer.from(`${this.settings.apiUsername}:${this.settings.apiPassword}`).toString('base64');
+        switch(this.settings.authenticationType){
+            case AUTH_TYPE_BASIC: {
+                const authorization: string = Buffer.from(`${this.settings.apiUsername}:${this.settings.apiPassword}`).toString('base64');
+                axios.defaults.headers.common['Authorization'] = `Basic ${authorization}`;
+                break;
+            }
+            default: {
+                throw new Error('Unsupported authentification type: ' + this.settings.authenticationType);
+            }
+        }
         axios.defaults.validateStatus = (status: number) => status >= 200 && status < 500;
-        axios.defaults.headers.common['Authorization'] = `Basic ${authorization}`;
     }
 
     private validateSettings(settings: Settings) {

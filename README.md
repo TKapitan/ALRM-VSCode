@@ -30,6 +30,9 @@ No specific requirements.
   - Specifies URL of the APIs
   - Format (for usage with Microsoft Dynamics 365 Business Central)
     - `https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/`
+- **al-id-range-manager.assignableRange**: Use the First Assignable Range
+  - Specifies type of the authorisation the API require
+  - Basic authorization is the only currently supported authorization method.
 - **al-id-range-manager.username**: API Username
   - Specifies username for autentification in the API
 - **al-id-range-manager.password**: API Password
@@ -39,8 +42,6 @@ No specific requirements.
   - Values
     - API: Using this value, the assignable range will be mandatory.
     - Do Not Use: Using this value, the assignable range will be skipped.
-
-Basic authorization is the only currently supported authorization method.
 
 ## Known Issues
 
