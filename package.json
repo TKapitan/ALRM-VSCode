@@ -51,7 +51,7 @@
             "Do Not Use"
           ],
           "default": "API",
-          "description": "Use the First Assignable Range"
+          "description": "Assignable Ranges"
         }
       }
     },

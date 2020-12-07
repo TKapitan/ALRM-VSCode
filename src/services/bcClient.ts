@@ -3,8 +3,6 @@ import Settings, { AUTH_TYPE_BASIC } from './settings';
 
 export class Resources {
     public static readonly extension = 'extensions';
-    public static readonly extensionObject = 'extensionObjects';
-    public static readonly extensionObjectField = 'extensionObjectFields';
     public static readonly assignableRange = 'assignableRanges';
 }
 

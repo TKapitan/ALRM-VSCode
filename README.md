@@ -22,7 +22,70 @@ Creates an extension object line record in connected Business Central instance. 
 
 ## Requirements
 
-No specific requirements.
+To use this VS Code extension, you must set API connection to the backend system that store, validate & manage all extension objects & fields details.
+
+We prepared Microsoft Dynamics 365 Business Central Extension that  met all requirements and is designed to work together with this VS Code extension. The source codes could be found on GitHub: <https://github.com/TKapitan/ALRM-BusinessCentral>
+
+However, this VS Code extension could be used with your own backend side, created in the Business Central or using any other programming language.
+
+To use this extension, the API must provide:
+
+- API endpoints (currently, only ODATA api format is supported)
+  - extensions
+    - The API endpoint must process POST create 
+      - The create request contains data
+        - id
+          - Guid
+          - Guid of the extension, is used as a key. The value is automatically loaded from the app.json file.
+        - rangeCode
+          - String
+          - Code of the ranges that should be used to assign IDs.
+          - Is used only when the "Assignable Ranges" is set to "API".
+        - name
+          - String (250 characters)
+          - Name of the extension automatically loaded from app.json
+        - description
+          - String (250 characters)
+          - Description of the extension automatically loaded from app.json
+    - The API endpoint must process two actions (POST requests) 
+      - Microsoft.NAV.createObject 
+        - Accept three parameters (newly created object identification) and return ID of the object as a number.
+        - Parameters
+          - objectType
+            - String
+            - Specifies type of the newly created object.
+            - In the format of Business Central objects (for example: Table/TableExtension/...).
+          - objectName
+            - String
+            - Specifies name of the newly created object.
+          - createBy
+            - String (50 characters)
+            - Specifies user identification who did the request.
+        - Return Value
+          - Number
+          - ID of the newly created object, will be automatically inserted to the created object.
+      - Microsoft.NAV.createObjectLine
+        - Accept two parameters (object identification in which the field should be created) and return ID of the field as a number.
+        - Parameters
+          - objectType
+            - String
+            - Specifies type of the object in which we want to create a field.
+            - In the format of Business Central objects (for example: Table/TableExtension/...).
+          - objectID
+            - String
+            - Specifies ID of the object in which we want to create a field.
+        - Return Value
+          - Number
+          - ID of the newly created field, will be automatically inserted to the created field.
+  - assignableRanges
+    - Is used only when the "Assignable Ranges" is set to "API".
+    - The API endpoint must process GET 
+      - Without filters
+      - Response must contain
+        - code
+          - String
+          - Identification of assignable ranges that could be used for creating a new extension.
+          - The value is later used as a parameter "rangeCode" in the "extensions" API endpoint for POST create method.
 
 ## Extension Settings
 
@@ -30,14 +93,14 @@ No specific requirements.
   - Specifies URL of the APIs
   - Format (for usage with Microsoft Dynamics 365 Business Central)
     - `https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/`
-- **al-id-range-manager.assignableRange**: Use the First Assignable Range
-  - Specifies type of the authorisation the API require
-  - Basic authorization is the only currently supported authorization method.
+- **al-id-range-manager.authenticationType**: API Authentication Type
+  - Specifies type of the authentification the API require
+  - Basic auth is the only currently supported authentification method.
 - **al-id-range-manager.username**: API Username
   - Specifies username for autentification in the API
 - **al-id-range-manager.password**: API Password
   - Specifies password for autentification in the API
-- **al-id-range-manager.assignableRange**: Use the First Assignable Range
+- **al-id-range-manager.assignableRange**: Assignable Ranges
   - Specifies how the assignable ranges should be used.
   - Values
     - API: Using this value, the assignable range will be mandatory.
