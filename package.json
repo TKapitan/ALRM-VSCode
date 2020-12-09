@@ -4,7 +4,7 @@
   "description": "Manage your object ids in Microsoft Business Central.",
   "publisher": "ARTAAAEfromCzechiaKeptycz",
   "version": "0.2.3",
-  "icon": "https://github.com/TKapitan/ALRM-VSCode/blob/master/resources/images/ALIDRangeManager.png",
+  "icon": "https://github.com/TKapitan/ALRM-VSCode/blob/master/resources/img/ALIDRangeManager.png",
   "engines": {
     "vscode": "^1.51.0"
   },
