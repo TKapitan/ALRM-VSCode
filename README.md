@@ -112,4 +112,4 @@ No known issues
 
 ## Release Notes
 
-See [changelog](CHANGELOG.md)
+See [changelog](https://github.com/TKapitan/ALRM-VSCode/blob/master/CHANGELOG.md)
