@@ -2,8 +2,9 @@
   "name": "al-id-range-manager",
   "displayName": "AL ID Range Manager",
   "description": "Manage your object ids in Microsoft Business Central.",
-  "publisher": "art-aa-ae",
-  "version": "0.0.1",
+  "publisher": "ARTAAAEfromCzechiaKeptycz",
+  "version": "0.2.3",
+  "icon": "https://github.com/TKapitan/ALRM-VSCode/blob/master/resources/images/ALIDRangeManager.png",
   "engines": {
     "vscode": "^1.51.0"
   },
@@ -17,9 +18,12 @@
     "onLanguage:al"
   ],
   "main": "./out/extension.js",
+  "repository": {
+    "directory": "https://github.com/TKapitan/ALRM-VSCode"
+  },
   "contributes": {
     "configuration": {
-      "title": "AL ID Range Manager",
+      "title": "ALRM: AL ID Range Manager",
       "properties": {
         "al-id-range-manager.baseUrl": {
           "type": "string",
