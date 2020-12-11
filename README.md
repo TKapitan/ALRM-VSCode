@@ -1,4 +1,4 @@
-# AL ID Range Manager (VS Code extensionú
+# AL ID Range Manager (VS Code extension)
 
 This VS Code extension provides quick and centralized object id assignment using any API (for example Microsoft Dynamics 365 Business Central API).
 
