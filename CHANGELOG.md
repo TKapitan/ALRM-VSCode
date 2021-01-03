@@ -5,10 +5,14 @@
 - Extend code for better usage for own backend part.
 - Allow to change which Snippets will be used to create a new object.
 - Add support for other possible types of authentification
-- Add support for Interface objects.
 - Add support for deleting fields (period updates).
 
 ## [Released Versions]
+
+### v0.2.4
+
+- Date of release: 03/01/2021
+- Add support for Interface objects.
 
 ### v0.2.3
 

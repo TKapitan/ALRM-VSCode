@@ -1,6 +1,6 @@
-# AL ID Range Manager
+# AL ID Range Manager (VS Code extension)
 
-This extension provides quick and centralized object id assignment using any API (for example Microsoft Dynamics 365 Business Central API).
+This VS Code extension provides quick and centralized object id assignment using any API (for example Microsoft Dynamics 365 Business Central API). The corresponding Microsoft Dynamics 365 Business Central extension that support all processes is also on GitHub: <https://github.com/TKapitan/ALRM-BusinessCentral>.
 
 ## Features
 
