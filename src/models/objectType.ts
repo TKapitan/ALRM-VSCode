@@ -10,4 +10,5 @@ export enum ObjectType {
     Query = 30,
     Enum = 35,
     EnumExtension = 36,
+    Interface = 90,
 }

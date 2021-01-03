@@ -76,6 +76,8 @@ function objectTypeSnippetFileName(objectType: ObjectType): string {
             return 'enum.json';
         case ObjectType.EnumExtension:
             return 'enumextension.json';
+        case ObjectType.Interface:
+            return 'interface.json';
         default:
             throw new Error(`Unimplemented type ${objectType}!`);
     }

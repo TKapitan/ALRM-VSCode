@@ -149,5 +149,8 @@ function substituteObjectInfo(
             return snippetHeader
                 .replace('${1:Id}', objectId)
                 .replace('${2:MyXmlport}', `"${objectName}"`);
+        case ObjectType.Interface:
+            return snippetHeader
+                .replace('${1:MyInterface}', `"${objectName}"`);
     }
 }
