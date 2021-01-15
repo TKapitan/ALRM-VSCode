@@ -13,6 +13,7 @@
   ],
   "activationEvents": [
     "onCommand:al-id-range-manager.initialize",
+    "onCommand:al-id-range-manager.initializeFromExisting",
     "onCommand:al-id-range-manager.newObject",
     "onCommand:al-id-range-manager.newObjectLine",
     "onLanguage:al"
@@ -63,6 +64,10 @@
       {
         "command": "al-id-range-manager.initialize",
         "title": "ALRM: Initialize"
+      },
+      {
+        "command": "al-id-range-manager.initializeFromExisting",
+        "title": "ALRM: Initialize from existing project"
       },
       {
         "command": "al-id-range-manager.newObject",

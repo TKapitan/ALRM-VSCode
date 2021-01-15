@@ -48,18 +48,32 @@ export default class ExtensionService {
         return extension;
     }
 
-    public async createExtensionObject(extension: Extension, objectType: ObjectType, objectName: string): Promise<number> {
-        const response = await this.client.callAction(Resources.extension, extension.code, 'createObject', {
-            objectType: objectType.toString(),
-            objectName: objectName,
-            createdBy: this.client.username?.substr(0, 50) ?? '',
-        });
-
-        const objectId = Number(response);
-        if (isNaN(objectId)) {
-            throw new Error(`Unexpected object id response: ${response}`);
+    public async createExtensionObject(extension: Extension | null, objectType: ObjectType, objectName: string, existingObjectId = ''): Promise<number> {
+        if(extension === null){
+            throw new Error('Can not create extension object for unknown extension.');
         }
-        return objectId;
+        
+        let response;
+        if (existingObjectId !== '') {
+            response = await this.client.callAction(Resources.extension, extension.code, 'createExistingObject', {
+                objectType: objectType.toString(),
+                objectID: +existingObjectId,
+                objectName: objectName,
+                createdBy: this.client.username?.substr(0, 50) ?? '',
+            });
+            return +existingObjectId;
+        } else {
+            response = await this.client.callAction(Resources.extension, extension.code, 'createObject', {
+                objectType: objectType.toString(),
+                objectName: objectName,
+                createdBy: this.client.username?.substr(0, 50) ?? '',
+            });
+            const objectId = Number(response);
+            if (isNaN(objectId)) {
+                throw new Error(`Unexpected object id response: ${response}`);
+            }
+            return objectId;
+        }
     }
 
     public async createExtensionObjectLine(extension: Extension, objectType: ObjectType, objectId: number): Promise<number> {

@@ -153,4 +153,5 @@ function substituteObjectInfo(
             return snippetHeader
                 .replace('${1:MyInterface}', `"${objectName}"`);
     }
+    throw new Error('Unknown object type: ' + objectType.toString());
 }
