@@ -49,25 +49,30 @@ export default class ExtensionService {
     }
 
     public async createExtensionObject(extension: Extension | null, objectType: ObjectType, objectName: string, existingObjectId = ''): Promise<number> {
-        if(extension === null){
+        if (extension === null) {
             throw new Error('Can not create extension object for unknown extension.');
         }
-        
+
         let response;
         if (existingObjectId !== '') {
-            response = await this.client.callAction(Resources.extension, extension.code, 'createExistingObject', {
+            response = await this.client.callAction(Resources.extension, extension.code, 'createObjectWithOwnID', {
                 objectType: objectType.toString(),
                 objectID: +existingObjectId,
                 objectName: objectName,
                 createdBy: this.client.username?.substr(0, 50) ?? '',
-            });
+            }).catch(
+                error => { throw new Error(`Synchronization failed: ${error}`); }
+            );
             return +existingObjectId;
         } else {
             response = await this.client.callAction(Resources.extension, extension.code, 'createObject', {
                 objectType: objectType.toString(),
                 objectName: objectName,
                 createdBy: this.client.username?.substr(0, 50) ?? '',
-            });
+            }).catch(
+                error => { throw new Error(`Synchronization failed: ${error}`); }
+            );
+
             const objectId = Number(response);
             if (isNaN(objectId)) {
                 throw new Error(`Unexpected object id response: ${response}`);

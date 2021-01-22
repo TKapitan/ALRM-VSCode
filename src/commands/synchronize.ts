@@ -1,39 +1,20 @@
-import { readAppJson, getCurrentWorkspaceUri } from "../services/fileService";
+import { getCurrentWorkspaceUri } from "../services/fileService";
 import ExtensionService from "../services/extensionService";
-import { showInformationMessage, showErrorMessage, getUserSelection } from "../helpers/userInteraction";
-import Settings from "../services/settings";
+import { showInformationMessage, showErrorMessage, promptInitialization } from "../helpers/userInteraction";
 import { hasObjectTypeIDs, ObjectType, translateObjectType } from "../models/objectType";
 import Extension from "../models/extension";
+import * as vscode from 'vscode';
 
 let extension: Extension | null;
-export default async function initiliazeFromExistingCommand(): Promise<void> {
+export default async function synchronizeCommand(): Promise<void> {
     try {
         const workspaceUri = getCurrentWorkspaceUri();
-        const app = readAppJson(workspaceUri);
-        if (app === null || app.id === '') {
-            throw new Error('Valid app.json not found!');
-        }
-
         const service = new ExtensionService();
+
         extension = await service.getExtension(workspaceUri);
-        if (extension !== null) {
-            showInformationMessage(`Existing extension ${extension.code} found!`);
-            // XXX at this point we could ask the user if they want to synchronize?
+        if (extension === null) {
+            promptInitialization();
             return;
-        }
-
-        if (Settings.instance.useAssignableRange) {
-            // XXX add range min/max to API
-            const assignableRanges = await service.getAllAssignableRanges();
-            // XXX then edit app.json ranges
-
-            const range = await getUserSelection(assignableRanges.map(e => e.code));
-            if (range === undefined) {
-                return; // canceled
-            }
-            extension = await service.createExtension(workspaceUri, app, range);
-        } else {
-            extension = await service.createExtension(workspaceUri, app);
         }
 
         const workspaceFolderPath = workspaceUri.fsPath + '/src';
@@ -43,21 +24,40 @@ export default async function initiliazeFromExistingCommand(): Promise<void> {
         if (!fs.existsSync(workspaceFolderPath)) {
             throw new Error('AL Project does not have src directory!');
         }
-        scanDirectory(workspaceFolderPath);
 
-        showInformationMessage(`Successfully initialized extension ${extension.code}!`);
-
+        return await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Synchronizing...',
+            cancellable: false
+        }, (progress) => {
+            const scanResult = scanDirectory(workspaceFolderPath);
+            return new Promise(resolve => {
+                resolve();
+                if (scanResult) {
+                    progress.report({
+                        increment: 100,
+                        message: `Synchronization of ${extension?.code} successful!`,
+                    });
+                } else {
+                    progress.report({
+                        increment: 100,
+                        message: `Synchronization of ${extension?.code} has finished but some errors were found.!`,
+                    });
+                    resolve();
+                }
+            });
+        });
     } catch (error) {
         showErrorMessage(error);
     }
 }
 
-function scanDirectory(workspaceFolderPath: string) {
-    // TODO Create similar command for rescan of existing project
+function scanDirectory(workspaceFolderPath: string): boolean {
+    let success = true;
     const fs = require("fs");
     fs.readdir(workspaceFolderPath, function (err: string, files: string[]) {
         if (err) {
-            return console.log('Unable to scan directory: ' + err);
+            throw err;
         }
 
         console.log('Scanning...');
@@ -70,7 +70,9 @@ function scanDirectory(workspaceFolderPath: string) {
         files.forEach(function (scannedItem) {
             scannedItemWithFullPath = workspaceFolderPath + '/' + scannedItem;
             if (fs.lstatSync(scannedItemWithFullPath).isDirectory()) {
-                scanDirectory(scannedItemWithFullPath);
+                if (!scanDirectory(scannedItemWithFullPath)) {
+                    success = false;
+                }
             } else {
                 fs.readFile(scannedItemWithFullPath, 'utf8', function (err: string, data: string) {
                     if (err) {
@@ -107,11 +109,21 @@ function scanDirectory(workspaceFolderPath: string) {
                     if (objectName.charAt(0) === '"') {
                         objectName = line.split('"')[1];
                     }
-                    registerALObject(objectType, objectID, objectName);
+                    registerALObject(
+                        objectType,
+                        objectID,
+                        objectName
+                    ).catch(
+                        function (error) {
+                            showErrorMessage(error);
+                            success = false;
+                        }
+                    );
                 });
             }
         });
     });
+    return success;
 }
 
 async function registerALObject(type: string, id: string, name: string) {
@@ -119,10 +131,23 @@ async function registerALObject(type: string, id: string, name: string) {
     const service = new ExtensionService();
     if (id === '') {
         console.log('Object type: ' + translateObjectType(type).toString() + ', object name: ' + name);
-        await service.createExtensionObject(extension, translateObjectType(type), name);
+        await service.createExtensionObject(
+            extension,
+            translateObjectType(type),
+            name
+        ).catch(
+            error => { throw new Error(error); }
+        );
     } else {
         console.log('Object type: ' + translateObjectType(type).toString() + ', object ID: ' + id + ', object name: ' + name);
-        await service.createExtensionObject(extension, translateObjectType(type), name, id);
+        await service.createExtensionObject(
+            extension,
+            translateObjectType(type),
+            name,
+            id
+        ).catch(
+            error => { throw new Error(error); }
+        );
     }
 }
 
