@@ -21,7 +21,7 @@ export default class BcClient {
         this.validateSettings(this.settings);
 
         this.baseUrl = this.settings.apiBaseUrl ?? '';
-        switch(this.settings.authenticationType){
+        switch (this.settings.authenticationType) {
             case AUTH_TYPE_BASIC: {
                 const authorization: string = Buffer.from(`${this.settings.apiUsername}:${this.settings.apiPassword}`).toString('base64');
                 axios.defaults.headers.common['Authorization'] = `Basic ${authorization}`;
@@ -106,6 +106,10 @@ export default class BcClient {
         const response = await this.sendRequest('POST', this.buildUrl(resource, id, actionName), data);
 
         if (response.data === null || typeof response.data !== 'object') {
+            if (typeof response.data === 'string' && response.data === ''){
+                // Calling API that has no return value
+                return '';
+            }
             throw new Error(`Unexpected return type: ${typeof response.data}`);
         }
         if ('value' in response.data) {
@@ -154,6 +158,7 @@ export default class BcClient {
             url += `/Microsoft.NAV.${actionName}`;
         }
 
+        url += '?tenant=default';
         if (queryParameters !== undefined) {
             const parameters: string[] = [];
             if (queryParameters.top !== undefined) {
@@ -167,10 +172,9 @@ export default class BcClient {
             }
 
             if (parameters.length !== 0) {
-                url += '?' + parameters.join('&');
+                url += '&' + parameters.join('&');
             }
         }
-
         return url;
     }
 }
