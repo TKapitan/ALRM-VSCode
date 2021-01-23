@@ -33,7 +33,7 @@ export function translateObjectType(fromString: string): ObjectType {
             return ObjectType.PageExtension;
         case 'table':
             return ObjectType.Table;
-        case 'tablextension':
+        case 'tableextension':
             return ObjectType.TableExtension;
         case 'query':
             return ObjectType.Query;
