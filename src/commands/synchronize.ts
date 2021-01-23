@@ -91,7 +91,7 @@ function scanDirectory(workspaceFolderPath: string): boolean {
 
                         counter++;
                         if (counter >= data.split('\n').length) { // TODO Add support for \r
-                            throw new Error('File ' + scannedItemWithFullPath + ' is not valid AL file.');
+                            throw new Error('File ' + scannedItemWithFullPath + ' is not valid AL file or this file is not well-formated.');
                         }
                     }
 
