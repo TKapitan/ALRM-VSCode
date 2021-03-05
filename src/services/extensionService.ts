@@ -60,18 +60,18 @@ export default class ExtensionService {
                 objectID: +existingObjectId,
                 objectName: objectName,
                 createdBy: this.client.username?.substr(0, 50) ?? '',
-            }).catch(
-                error => { throw new Error(`Synchronization failed: ${error}`); }
-            );
+            });//.catch(
+            //    error => { throw new Error(`Synchronization failed: ${error}`); }
+            //);
             return +existingObjectId;
         } else {
             response = await this.client.callAction(Resources.extension, extension.code, 'createObject', {
                 objectType: objectType.toString(),
                 objectName: objectName,
                 createdBy: this.client.username?.substr(0, 50) ?? '',
-            }).catch(
-                error => { throw new Error(`Synchronization failed: ${error}`); }
-            );
+            });//.catch(
+            //    error => { throw new Error(`Synchronization failed: ${error}`); }
+            //);
 
             const objectId = Number(response);
             if (isNaN(objectId)) {
@@ -81,17 +81,32 @@ export default class ExtensionService {
         }
     }
 
-    public async createExtensionObjectLine(extension: Extension, objectType: ObjectType, objectId: number): Promise<number> {
-        const response = await this.client.callAction(Resources.extension, extension.code, 'createObjectLine', {
-            objectType: objectType.toString(),
-            objectID: objectId.toString(),
-        });
-
-        const objectLineId = Number(response);
-        if (isNaN(objectLineId)) {
-            throw new Error(`Unexpected object id response: ${response}`);
+    public async createExtensionObjectLine(extension: Extension | null, objectType: ObjectType, objectId: number, existingFieldOrValueId = ''): Promise<number | null> {
+        if (extension === null) {
+            throw new Error('Can not create extension object line for unknown extension.');
         }
-        return objectLineId;
+
+        if (existingFieldOrValueId !== '') {
+            await this.client.callAction(Resources.extension, extension.code, 'createObjectFieldOrValueWithOwnID', {
+                objectType: objectType.toString(),
+                objectID: objectId.toString(),
+                fieldOrValueID: existingFieldOrValueId,
+                createdBy: this.client.username?.substr(0, 50) ?? '',
+            });
+            return null;
+        } else {
+            const response = await this.client.callAction(Resources.extension, extension.code, 'createObjectFieldOrValue', {
+                objectType: objectType.toString(),
+                objectID: objectId.toString(),
+                createdBy: this.client.username?.substr(0, 50) ?? '',
+            });
+
+            const objectLineId = Number(response);
+            if (isNaN(objectLineId)) {
+                throw new Error(`Unexpected object id response: ${response}`);
+            }
+            return objectLineId;
+        }
     }
 
     private async getBcExtension(id: string): Promise<Extension | null> {

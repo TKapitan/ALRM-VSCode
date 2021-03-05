@@ -15,8 +15,8 @@ export enum ObjectType {
 }
 const objectsWithoutID: ObjectType[] = [ObjectType.Interface];
 
-export function hasObjectTypeIDs(objectType: string): boolean{
-    return objectsWithoutID.findIndex(x => x === translateObjectType(objectType)) === -1;
+export function hasObjectTypeIDs(objectType: ObjectType): boolean{
+    return objectsWithoutID.findIndex(x => x === objectType) === -1;
 }
 
 export function translateObjectType(fromString: string): ObjectType {

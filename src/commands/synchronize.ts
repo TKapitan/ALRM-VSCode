@@ -1,9 +1,10 @@
 import { getCurrentWorkspaceUri } from "../services/fileService";
 import ExtensionService from "../services/extensionService";
-import { showInformationMessage, showErrorMessage, promptInitialization } from "../helpers/userInteraction";
+import { showErrorMessage, promptInitialization, showInformationMessage } from "../helpers/userInteraction";
 import { hasObjectTypeIDs, ObjectType, translateObjectType } from "../models/objectType";
 import Extension from "../models/extension";
 import * as vscode from 'vscode';
+import * as fs from "fs";
 
 let extension: Extension | null;
 export default async function synchronizeCommand(): Promise<void> {
@@ -20,7 +21,6 @@ export default async function synchronizeCommand(): Promise<void> {
         const workspaceFolderPath = workspaceUri.fsPath + '/src';
         console.log(workspaceFolderPath);
 
-        const fs = require("fs");
         if (!fs.existsSync(workspaceFolderPath)) {
             throw new Error('AL Project does not have src directory!');
         }
@@ -29,105 +29,173 @@ export default async function synchronizeCommand(): Promise<void> {
             location: vscode.ProgressLocation.Notification,
             title: 'Synchronizing...',
             cancellable: false
-        }, (progress) => {
-            const scanResult = scanDirectory(workspaceFolderPath);
-            return new Promise(resolve => {
-                resolve();
-                if (scanResult) {
-                    progress.report({
-                        increment: 100,
-                        message: `Synchronization of ${extension?.code} successful!`,
-                    });
-                } else {
-                    progress.report({
-                        increment: 100,
-                        message: `Synchronization of ${extension?.code} has finished but some errors were found.!`,
-                    });
-                    resolve();
-                }
-            });
+        }, async (progress) => {
+            const [success, errors] = await scanDirectory(workspaceFolderPath);
+            if (!success) {
+                console.log(errors);
+                progress.report({ increment: 100 });
+                showErrorMessage(`Synchronization of ${extension?.code} has finished with errors:\n` + errors);
+            }
+            progress.report({ increment: 100 });
+            showInformationMessage(`Synchronization of ${extension?.code} successful!`);
         });
     } catch (error) {
         showErrorMessage(error);
     }
+    return;
 }
 
-function scanDirectory(workspaceFolderPath: string): boolean {
+async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, string]> {
     let success = true;
+    let errorStrings = '';
     const fs = require("fs");
-    fs.readdir(workspaceFolderPath, function (err: string, files: string[]) {
-        if (err) {
-            throw err;
-        }
+    const files = fs.readdirSync(workspaceFolderPath);
 
-        console.log('Scanning...');
-        let counter: number;
-        let scannedItemWithFullPath: string;
-        let line: string;
-        let objectType: string;
-        let objectID: string;
-        let objectName: string;
-        files.forEach(function (scannedItem) {
-            scannedItemWithFullPath = workspaceFolderPath + '/' + scannedItem;
-            if (fs.lstatSync(scannedItemWithFullPath).isDirectory()) {
-                if (!scanDirectory(scannedItemWithFullPath)) {
-                    success = false;
-                }
-            } else {
-                fs.readFile(scannedItemWithFullPath, 'utf8', function (err: string, data: string) {
-                    if (err) {
-                        throw err;
+    console.log('Scanning directory: ' + workspaceFolderPath);
+    let scannedItemWithFullPath: string;
+    let fileLines: string[], fileLine: string;
+    let objectType: string, objectID: string;
+    let scanForObjectFields = false;
+    for (const fileOrDirName of files) {
+        objectType = '';
+        objectID = '';
+        scanForObjectFields = false;
+        scannedItemWithFullPath = workspaceFolderPath + '/' + fileOrDirName;
+        if (fs.lstatSync(scannedItemWithFullPath).isDirectory()) {
+            const [results, returnedErrors] = await scanDirectory(scannedItemWithFullPath);
+            if (!results) {
+                errorStrings += returnedErrors;
+                success = false;
+            }
+        } else {
+            const data = fs.readFileSync(scannedItemWithFullPath, 'utf8').toString();
+
+            let inFieldsSection = false, inFieldSection = false;
+            let noOfOpenBrackets = 0, counter = 0;
+            fileLines = data.split('\n');
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+                try {
+                    fileLine = fileLines[counter];
+
+                    if (!scanForObjectFields) {
+                        // Scan for objects
+                        [scanForObjectFields, objectType, objectID] = await tryScanObject(fileOrDirName, fileLine);
+                    } else {
+                        // Scan for fields or values in extension objects
+                        [inFieldsSection, inFieldSection, noOfOpenBrackets] = await scanObjectFieldsValues(fileLine, objectType, objectID, inFieldsSection, inFieldSection, noOfOpenBrackets);
                     }
 
-                    counter = 0;
-                    // eslint-disable-next-line no-constant-condition
-                    while (true) {
-                        line = data.split('\n')[counter]; // TODO Add support for \r
-                        if (line !== undefined) {
-                            if (translateObjectType(line.split(' ')[0]) !== ObjectType.UnKnownObjectType) {
-                                break;
-                            }
-                        }
-
-                        counter++;
-                        if (counter >= data.split('\n').length) { // TODO Add support for \r
+                    counter++;
+                    if (counter > fileLines.length) {
+                        if ((objectType === '' || objectID === '') || (inFieldsSection || inFieldSection || noOfOpenBrackets > 0)) {
                             throw new Error('File ' + scannedItemWithFullPath + ' is not valid AL file or this file is not well-formated.');
                         }
+                        break;
                     }
-
-                    console.log(line);
-
-                    objectType = line.split(' ')[0];
-                    objectID = '';
-                    if (hasObjectTypeIDs(objectType)) {
-                        objectID = line.split(' ')[1];
-                        objectName = line.split(' ')[2];
-                    } else {
-                        objectName = line.split(' ')[1];
-                    }
-
-                    if (objectName.charAt(0) === '"') {
-                        objectName = line.split('"')[1];
-                    }
-                    registerALObject(
-                        objectType,
-                        objectID,
-                        objectName
-                    ).catch(
-                        function (error) {
-                            showErrorMessage(error);
-                            success = false;
-                        }
-                    );
-                });
+                } catch (error) {
+                    success = false;
+                    errorStrings += '\n' + error;
+                    break;
+                }
             }
-        });
-    });
-    return success;
+        }
+    }
+    return [success, errorStrings];
 }
 
-async function registerALObject(type: string, id: string, name: string) {
-    // TODO for table extension and enum extension register also all added fields
+async function tryScanObject(
+    fileName: string,
+    fileLine: String,
+): Promise<[boolean, string, string]> {
+    let objectID = '', objectName = '';
+    const objectTypeString: string = fileLine.split(' ')[0];
+    const objectType: ObjectType = translateObjectType(objectTypeString);
+    if (objectType !== ObjectType.UnKnownObjectType) {
+        // Parse object ID & name
+        if (hasObjectTypeIDs(objectType)) {
+            objectID = fileLine.split(' ')[1];
+            objectName = fileLine.split(' ')[2];
+        } else {
+            objectName = fileLine.split(' ')[1];
+        }
+
+        if (objectName.charAt(0) === '"') {
+            objectName = fileLine.split('"')[1];
+        }
+
+        if (objectName === '' || (objectID === '' && hasObjectTypeIDs(objectType))) {
+            throw new Error('File ' + fileName + ' is not well-formated.');
+        }
+
+        // Register object
+        await registerALObject(
+            objectTypeString,
+            objectID,
+            objectName
+        );
+
+        // If the file is not tableextension nor enumextension, do not parse the rest of file
+        if (objectType !== ObjectType.TableExtension) {
+            return [false, objectTypeString, objectID];
+        }
+        return [true, objectTypeString, objectID];
+    }
+    return [false, '', ''];
+}
+
+async function scanObjectFieldsValues(
+    fileLine: String,
+    objectType: string,
+    objectID: string,
+    inFieldsSection: boolean,
+    inFieldSection: boolean,
+    noOfOpenBrackets: number,
+): Promise<[boolean, boolean, number]> {
+    if (fileLine.includes('fields')) {
+        inFieldsSection = true;
+    }
+    if (inFieldsSection) {
+        if (fileLine.includes('{')) {
+            noOfOpenBrackets += 1;
+        }
+        if (inFieldSection || (noOfOpenBrackets === 1 && fileLine.includes('field'))) {
+            if (!inFieldSection && fileLine.includes('field')) {
+                const fieldOrValueID = fileLine.split(';')[0];
+                await registerALFieldOrValueID(
+                    objectType,
+                    objectID,
+                    fieldOrValueID.substr(fieldOrValueID.indexOf('(') + 1)
+                );
+            }
+
+            inFieldSection = true;
+            if (fileLine.includes('}')) {
+                inFieldSection = false;
+            }
+        }
+        if (fileLine.includes('}')) {
+            noOfOpenBrackets -= 1;
+            if (!inFieldSection && noOfOpenBrackets <= 0) {
+                inFieldsSection = false;
+            }
+        }
+    }
+    return [inFieldsSection, inFieldSection, noOfOpenBrackets];
+}
+
+async function registerALFieldOrValueID(objectType: string, objectId: string, fieldOrValueID: string): Promise<void> {
+    const service = new ExtensionService();
+    console.log(' Field ID: ' + fieldOrValueID);
+    await service.createExtensionObjectLine(
+        extension,
+        translateObjectType(objectType),
+        +objectId,
+        fieldOrValueID
+    );
+}
+
+async function registerALObject(type: string, id: string, name: string): Promise<void> {
     const service = new ExtensionService();
     if (id === '') {
         console.log('Object type: ' + translateObjectType(type).toString() + ', object name: ' + name);
@@ -135,8 +203,6 @@ async function registerALObject(type: string, id: string, name: string) {
             extension,
             translateObjectType(type),
             name
-        ).catch(
-            error => { throw new Error(error); }
         );
     } else {
         console.log('Object type: ' + translateObjectType(type).toString() + ', object ID: ' + id + ', object name: ' + name);
@@ -145,8 +211,6 @@ async function registerALObject(type: string, id: string, name: string) {
             translateObjectType(type),
             name,
             id
-        ).catch(
-            error => { throw new Error(error); }
         );
     }
 }
