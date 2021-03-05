@@ -30,7 +30,9 @@ export default async function newObjectLineCommand(): Promise<void> {
         }
 
         const newLineId = await service.createExtensionObjectLine(extension, fileInfo.objectType, fileInfo.objectId);
-        await insertNewLine(fileInfo.objectType, newLineId);
+        if (newLineId !== null) {
+            await insertNewLine(fileInfo.objectType, newLineId);
+        }
     } catch (error) {
         showErrorMessage(error);
     }
