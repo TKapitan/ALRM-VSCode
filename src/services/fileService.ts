@@ -16,7 +16,11 @@ export function readAppJson(workspaceFolderUri?: vscode.Uri): App {
     if (!fs.existsSync(appJsonFileName)) {
         throw new Error('App.json not found!');
     }
-    return App.fromJson(require(appJsonFileName));
+    const app: App = App.fromJson(require(appJsonFileName));
+    if (app === null || app.id === '') {
+        throw new Error('App.json is not valid!');
+    }
+    return app;
 }
 
 export function getCurrentWorkspaceUri(): vscode.Uri {

@@ -2,15 +2,24 @@ export default class App {
     id: string;
     name: string;
     description: string;
+    runtime: string;
+    platform: string;
+    application: string;
 
     constructor(
         id: string,
         name: string,
         description: string,
+        runtime: string,
+        platform: string,
+        application: string,
     ) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.runtime = runtime;
+        this.platform = platform;
+        this.application = application;
     }
 
     public static fromJson(json: Object): App {
@@ -18,6 +27,9 @@ export default class App {
             'id' in json ? json['id'] : '',
             'name' in json ? json['name'] : '',
             'brief' in json ? json['brief'] : '',
+            'runtime' in json ? json['brief'] : '',
+            'platform' in json ? json['brief'] : '',
+            'application' in json ? json['brief'] : '',
         );
     }
 }

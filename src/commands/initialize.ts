@@ -7,9 +7,6 @@ export default async function initiliazeCommand(): Promise<void> {
     try {
         const workspaceUri = getCurrentWorkspaceUri();
         const app = readAppJson(workspaceUri);
-        if (app === null || app.id === '') {
-            throw new Error('Valid app.json not found!');
-        }
         const service = new ExtensionService();
         let extension = await service.getExtension(workspaceUri);
         if (extension !== null) {
