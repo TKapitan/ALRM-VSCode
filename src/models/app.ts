@@ -27,9 +27,9 @@ export default class App {
             'id' in json ? json['id'] : '',
             'name' in json ? json['name'] : '',
             'brief' in json ? json['brief'] : '',
-            'runtime' in json ? json['brief'] : '',
-            'platform' in json ? json['brief'] : '',
-            'application' in json ? json['brief'] : '',
+            'runtime' in json ? json['runtime'] : '',
+            'platform' in json ? json['platform'] : '',
+            'application' in json ? json['application'] : '',
         );
     }
 }
