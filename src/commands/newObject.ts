@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { getUserInput, getUserSelection, promptInitialization, showErrorMessage } from '../helpers/userInteraction';
-import { ObjectType, originalObjects, runtime04Objects, runtime05Objects, runtime06Objects, substituteObjectInfo } from '../models/objectType';
+import { ObjectType, originalObjects, runtime04Objects, runtime05Objects, runtime06Objects, runtime07Objects, substituteObjectInfo } from '../models/objectType';
 import ExtensionService from '../services/extensionService';
 import { getCurrentWorkspaceUri, readAppJson, readSnippetFile } from '../services/fileService';
 
@@ -54,6 +54,9 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
     }
     if (app.runtime >= '6.0') {
         objectTypesArray = objectTypesArray.concat(runtime06Objects);
+    }
+    if (app.runtime >= '7.0') {
+        objectTypesArray = objectTypesArray.concat(runtime07Objects);
     }
     for (const objectTypeID of objectTypesArray) {
         items.push(ObjectType[objectTypeID]);

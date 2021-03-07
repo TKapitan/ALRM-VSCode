@@ -8,10 +8,14 @@ export enum ObjectType {
     PageCustomization = 12,
     Codeunit = 15,
     Report = 20,
+    ReportExtension = 21,
     XMLPort = 25,
     Query = 30,
     Enum = 35,
     EnumExtension = 36,
+    PermissionSet = 40,
+    PermissionSetExtension = 41,
+    Entitlement = 45,
     Profile = 85,
     Interface = 90,
 }
@@ -38,12 +42,19 @@ export const runtime05Objects: ObjectType[] = [
 export const runtime06Objects: ObjectType[] = [
 
 ];
+export const runtime07Objects: ObjectType[] = [
+    ObjectType.ReportExtension,
+    ObjectType.PermissionSet,
+    ObjectType.PermissionSetExtension,
+    ObjectType.Entitlement
+];
 
 // Specify objects that have no ID in their definition
 const objectsWithoutID: ObjectType[] = [
     ObjectType.PageCustomization,
     ObjectType.Interface,
     ObjectType.Profile,
+    ObjectType.Entitlement
 ];
 export function hasObjectTypeIDs(objectType: ObjectType): boolean {
     return objectsWithoutID.findIndex(x => x === objectType) === -1;
@@ -54,10 +65,6 @@ export function translateObjectType(fromString: string): ObjectType {
     switch (fromString) {
         case 'codeunit':
             return ObjectType.Codeunit;
-        case 'enum':
-            return ObjectType.Enum;
-        case 'enumextension':
-            return ObjectType.EnumExtension;
         case 'page':
             return ObjectType.Page;
         case 'pageextension':
@@ -72,12 +79,23 @@ export function translateObjectType(fromString: string): ObjectType {
             return ObjectType.Query;
         case 'report':
             return ObjectType.Report;
+        case 'reportextension':
+            return ObjectType.ReportExtension;
         case 'xmlport':
             return ObjectType.XMLPort;
-        case 'interface':
-            return ObjectType.Interface;
+        case 'enum':
+            return ObjectType.Enum;
+        case 'enumextension':
+            return ObjectType.EnumExtension;
+        case 'permissionset':
+            return ObjectType.Enum;
+        // TODO PermissionSetExtension has same value as permissionset?
+        case 'permissionsetextension':
+            return ObjectType.EnumExtension;
         case 'profile':
             return ObjectType.Profile;
+        case 'interface':
+            return ObjectType.Interface;
     }
     return ObjectType.UnKnownObjectType;
 }
@@ -99,6 +117,8 @@ export function objectTypeSnippetFileName(objectType: ObjectType): string {
             return 'codeunit.json';
         case ObjectType.Report:
             return 'report.json';
+        case ObjectType.ReportExtension:
+            return 'reportextension.json';
         case ObjectType.XMLPort:
             return 'xmlport.json';
         case ObjectType.Query:
@@ -107,10 +127,14 @@ export function objectTypeSnippetFileName(objectType: ObjectType): string {
             return 'enum.json';
         case ObjectType.EnumExtension:
             return 'enumextension.json';
-        case ObjectType.Interface:
-            return 'interface.json';
+        case ObjectType.PermissionSet:
+            return 'permissionset.json';
+        case ObjectType.PermissionSetExtension:
+            return 'permissionsetextension.json';
         case ObjectType.Profile:
             return 'profile.json';
+        case ObjectType.Interface:
+            return 'interface.json';
         default:
             throw new Error(`Unimplemented type ${objectType}!`);
     }
@@ -128,15 +152,6 @@ export function substituteObjectInfo(
             return snippetHeader
                 .replace('${1:Id}', objectId)
                 .replace('${2:MyCodeunit}', `"${objectName}"`);
-        case ObjectType.Enum:
-            return snippetHeader
-                .replace('${1:id}', objectId)
-                .replace('${2:MyEnum}', `"${objectName}"`);
-        // XXX default enum extension snippet contains value snippet
-        case ObjectType.EnumExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyEnumExtension}', `"${objectName}"`);
         case ObjectType.Page:
             return snippetHeader
                 .replace('${1:Id}', objectId)
@@ -156,6 +171,10 @@ export function substituteObjectInfo(
             return snippetHeader
                 .replace('${1:Id}', objectId)
                 .replace('${2:MyReport}', `"${objectName}"`);
+        case ObjectType.ReportExtension:
+            return snippetHeader
+                .replace('${1:Id}', objectId)
+                .replace('${2:MyReport}', `"${objectName}"`);
         case ObjectType.Table:
             return snippetHeader
                 .replace('${1:id}', objectId)
@@ -168,13 +187,30 @@ export function substituteObjectInfo(
             return snippetHeader
                 .replace('${1:Id}', objectId)
                 .replace('${2:MyXmlport}', `"${objectName}"`);
-        case ObjectType.Interface:
+        case ObjectType.Enum:
             return snippetHeader
-                .replace('${1:MyInterface}', `"${objectName}"`);
+                .replace('${1:Id}', objectId)
+                .replace('${2:MyEnum}', `"${objectName}"`);
+        // XXX default enum extension snippet contains value snippet
+        case ObjectType.EnumExtension:
+            return snippetHeader
+                .replace('${1:Id}', objectId)
+                .replace('${2:MyEnumExtension}', `"${objectName}"`);
+        case ObjectType.PermissionSet:
+            return snippetHeader
+                .replace('${1:Id}', objectId)
+                .replace('${2:MyPermissionSet}', `"${objectName}"`);
+        case ObjectType.PermissionSetExtension:
+            return snippetHeader
+                .replace('${1:Id}', objectId)
+                .replace('${2:MyPermissionSet}', `"${objectName}"`);
         // TODO There are two snippets for profile in the file
         case ObjectType.Profile:
             return snippetHeader
                 .replace('${1:MyProfile}', `"${objectName}"`);
+        case ObjectType.Interface:
+            return snippetHeader
+                .replace('${1:MyInterface}', `"${objectName}"`);
     }
     throw new Error('Unknown object type: ' + objectType.toString());
 }
