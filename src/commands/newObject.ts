@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { getUserInput, getUserSelection, promptInitialization, showErrorMessage } from '../helpers/userInteraction';
-import { ObjectType } from '../models/objectType';
+import { ObjectType, originalObjects, runtime04Objects, runtime05Objects, runtime06Objects, substituteObjectInfo } from '../models/objectType';
 import ExtensionService from '../services/extensionService';
-import { getCurrentWorkspaceUri, readSnippetFile } from '../services/fileService';
+import { getCurrentWorkspaceUri, readAppJson, readSnippetFile } from '../services/fileService';
 
 export default async function newObjectCommand(): Promise<void> {
     try {
@@ -43,10 +43,20 @@ export default async function newObjectCommand(): Promise<void> {
 async function promptObjectSelection(): Promise<ObjectType | undefined> {
     const items: string[] = [];
 
-    for (const value of Object.values(ObjectType)) {
-        if (typeof value === 'string') {
-            items.push(value);
-        }
+    const workspaceUri = getCurrentWorkspaceUri();
+    const app = readAppJson(workspaceUri);
+    let objectTypesArray = originalObjects;
+    if (app.runtime >= '4.0') {
+        objectTypesArray = objectTypesArray.concat(runtime04Objects);
+    }
+    if (app.runtime >= '5.0') {
+        objectTypesArray = objectTypesArray.concat(runtime05Objects);
+    }
+    if (app.runtime >= '6.0') {
+        objectTypesArray = objectTypesArray.concat(runtime06Objects);
+    }
+    for (const objectTypeID of objectTypesArray) {
+        items.push(ObjectType[objectTypeID]);
     }
     const selection = await getUserSelection(items);
     if (selection === undefined) {
@@ -98,60 +108,4 @@ function buildObjectSnippet(
     const snippetString = new vscode.SnippetString(snippetLines.join('\n'));
 
     return snippetString;
-
-}
-
-function substituteObjectInfo(
-    snippetHeader: string,
-    objectType: ObjectType,
-    objectName: string,
-    objectId: string,
-): string {
-    switch (objectType) {
-        case ObjectType.Codeunit:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyCodeunit}', `"${objectName}"`);
-        case ObjectType.Enum:
-            return snippetHeader
-                .replace('${1:id}', objectId)
-                .replace('${2:MyEnum}', `"${objectName}"`);
-        // XXX default enum extension snippet contains value snippet
-        case ObjectType.EnumExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyEnumExtension}', `"${objectName}"`);
-        case ObjectType.Page:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyPage}', `"${objectName}"`);
-        case ObjectType.PageExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyExtension}', `"${objectName}"`);
-        case ObjectType.Query:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyQuery}', `"${objectName}"`);
-        case ObjectType.Report:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyReport}', `"${objectName}"`);
-        case ObjectType.Table:
-            return snippetHeader
-                .replace('${1:id}', objectId)
-                .replace('${2:MyTable}', `"${objectName}"`);
-        case ObjectType.TableExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyExtension}', `"${objectName}"`);
-        case ObjectType.XMLPort:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyXmlport}', `"${objectName}"`);
-        case ObjectType.Interface:
-            return snippetHeader
-                .replace('${1:MyInterface}', `"${objectName}"`);
-    }
-    throw new Error('Unknown object type: ' + objectType.toString());
 }

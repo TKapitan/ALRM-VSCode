@@ -2,7 +2,7 @@ import { join } from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import App from '../models/app';
-import { ObjectType } from '../models/objectType';
+import { ObjectType, objectTypeSnippetFileName } from '../models/objectType';
 
 const ALLANGUAGE = 'ms-dynamics-smb.al';
 
@@ -56,35 +56,6 @@ export function readSnippetFile(objectType: ObjectType): Buffer {
     }
 
     throw new Error(`Snippet file ${snippetFileName} not found!`);
-}
-
-function objectTypeSnippetFileName(objectType: ObjectType): string {
-    switch (objectType) {
-        case ObjectType.Table:
-            return 'table.json';
-        case ObjectType.TableExtension:
-            return 'tableextension.json';
-        case ObjectType.Page:
-            return 'page.json';
-        case ObjectType.PageExtension:
-            return 'pageextension.json';
-        case ObjectType.Codeunit:
-            return 'codeunit.json';
-        case ObjectType.Report:
-            return 'report.json';
-        case ObjectType.XMLPort:
-            return 'xmlport.json';
-        case ObjectType.Query:
-            return 'query.json';
-        case ObjectType.Enum:
-            return 'enum.json';
-        case ObjectType.EnumExtension:
-            return 'enumextension.json';
-        case ObjectType.Interface:
-            return 'interface.json';
-        default:
-            throw new Error(`Unimplemented type ${objectType}!`);
-    }
 }
 
 export function readCurrentFile(): string | undefined {
