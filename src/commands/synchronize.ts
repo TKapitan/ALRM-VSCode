@@ -55,10 +55,12 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
     let scannedItemWithFullPath: string;
     let fileLines: string[], fileLine: string;
     let objectType: string, objectID: string;
-    let scanForObjectFields = false;
+    let scanForObject;
+    let scanForObjectFields;
     for (const fileOrDirName of files) {
         objectType = '';
         objectID = '';
+        scanForObject = true;
         scanForObjectFields = false;
         scannedItemWithFullPath = workspaceFolderPath + '/' + fileOrDirName;
         if (fs.lstatSync(scannedItemWithFullPath).isDirectory()) {
@@ -80,19 +82,25 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
                     try {
                         fileLine = fileLines[counter];
 
-                        if (!scanForObjectFields) {
+                        if (scanForObject) {
                             // Scan for objects
-                            if (objectType === '' && objectID === '') {
+                            if (scanForObject) {
                                 [scanForObjectFields, objectType, objectID] = await tryScanObject(fileOrDirName, fileLine);
+                                if((objectType !== '' && (!hasObjectTypeIDs(translateObjectType(objectType)) || objectID !== ''))){
+                                    scanForObject = false;
+                                    if(!scanForObjectFields){
+                                        break;
+                                    }
+                                }
                             }
-                        } else {
+                        } else if (scanForObjectFields) {
                             // Scan for fields or values in extension objects
                             [inFieldsSection, inFieldSection, noOfOpenBrackets] = await scanObjectFieldsValues(fileLine, objectType, objectID, inFieldsSection, inFieldSection, noOfOpenBrackets);
                         }
 
                         counter++;
                         if (counter >= fileLines.length) {
-                            if ((objectType === '' || (hasObjectTypeIDs(translateObjectType(objectType)) && objectID === '')) || (inFieldsSection || inFieldSection || noOfOpenBrackets > 0)) {
+                            if (scanForObject || (scanForObjectFields && (inFieldsSection || inFieldSection || noOfOpenBrackets > 0))) {
                                 throw new Error('File ' + scannedItemWithFullPath + ' is not valid AL file or this file is not well-formated.');
                             }
                             break;
