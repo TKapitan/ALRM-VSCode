@@ -56,11 +56,12 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
     let fileLines: string[], fileLine: string;
     let objectType: string, objectID: string;
     let scanForObject;
-    let scanForObjectFields;
+    let scanForObjectFields: boolean, scanForObjectValues: boolean;
     for (const fileOrDirName of files) {
         objectType = '';
         objectID = '';
         scanForObject = true;
+        scanForObjectValues = false;
         scanForObjectFields = false;
         scannedItemWithFullPath = workspaceFolderPath + '/' + fileOrDirName;
         if (fs.lstatSync(scannedItemWithFullPath).isDirectory()) {
@@ -74,7 +75,7 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
             if (extPosition >= 0 && scannedItemWithFullPath.substr(extPosition) === '.al') {
                 const data = fs.readFileSync(scannedItemWithFullPath, 'utf8').toString();
 
-                let inFieldsSection = false, inFieldSection = false;
+                let inFieldsSection = false, inFieldOrValueSection = false;
                 let noOfOpenBrackets = 0, counter = 0;
                 fileLines = data.split('\n');
                 // eslint-disable-next-line no-constant-condition
@@ -85,22 +86,41 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
                         if (scanForObject) {
                             // Scan for objects
                             if (scanForObject) {
-                                [scanForObjectFields, objectType, objectID] = await tryScanObject(fileOrDirName, fileLine);
-                                if((objectType !== '' && (!hasObjectTypeIDs(translateObjectType(objectType)) || objectID !== ''))){
+                                [objectType, objectID] = await tryScanObject(fileOrDirName, fileLine);
+                                if ((objectType !== '' && (!hasObjectTypeIDs(translateObjectType(objectType)) || objectID !== ''))) {
                                     scanForObject = false;
-                                    if(!scanForObjectFields){
+
+                                    // If the file is not tableextension nor enumextension, do not parse the rest of file
+                                    switch (translateObjectType(objectType)) {
+                                        case ObjectType.TableExtension:
+                                            scanForObjectFields = true;
+                                            break;
+                                        case ObjectType.EnumExtension:
+                                            scanForObjectValues = true;
+                                            break;
+                                    }
+                                    if (!scanForObjectFields && !scanForObjectValues) {
                                         break;
                                     }
                                 }
                             }
                         } else if (scanForObjectFields) {
-                            // Scan for fields or values in extension objects
-                            [inFieldsSection, inFieldSection, noOfOpenBrackets] = await scanObjectFieldsValues(fileLine, objectType, objectID, inFieldsSection, inFieldSection, noOfOpenBrackets);
+                            // Scan for fields of table extension
+                            [inFieldsSection, inFieldOrValueSection, noOfOpenBrackets] = await scanObjectFields(fileLine, objectType, objectID, inFieldsSection, inFieldOrValueSection, noOfOpenBrackets);
+                        } else if (scanForObjectValues) {
+                            // Scan for values of enum extension
+                            [inFieldOrValueSection, noOfOpenBrackets] = await scanObjectValues(fileLine, objectType, objectID, inFieldOrValueSection, noOfOpenBrackets);
                         }
 
                         counter++;
                         if (counter >= fileLines.length) {
-                            if (scanForObject || (scanForObjectFields && (inFieldsSection || inFieldSection || noOfOpenBrackets > 0))) {
+                            if (scanForObject) {
+                                throw new Error('Could not determine file type, name or ID in file ' + scannedItemWithFullPath);
+                            }
+                            if (scanForObjectFields && (inFieldsSection || inFieldOrValueSection || noOfOpenBrackets > 0)) {
+                                throw new Error('File ' + scannedItemWithFullPath + ' is not valid AL file or this file is not well-formated.');
+                            }
+                            if (scanForObjectValues && (inFieldOrValueSection || noOfOpenBrackets > 0)) {
                                 throw new Error('File ' + scannedItemWithFullPath + ' is not valid AL file or this file is not well-formated.');
                             }
                             break;
@@ -120,7 +140,7 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
 async function tryScanObject(
     fileName: string,
     fileLine: String,
-): Promise<[boolean, string, string]> {
+): Promise<[string, string]> {
     let objectID = '', objectName = '';
     const fileLineBySpace: string[] = fileLine.split(' ');
     const objectTypeString: string = fileLineBySpace[0];
@@ -148,17 +168,12 @@ async function tryScanObject(
             objectID,
             objectName
         );
-
-        // If the file is not tableextension nor enumextension, do not parse the rest of file
-        if (objectType !== ObjectType.TableExtension) {
-            return [false, objectTypeString, objectID];
-        }
-        return [true, objectTypeString, objectID];
+        return [objectTypeString, objectID];
     }
-    return [false, '', ''];
+    return ['', ''];
 }
 
-async function scanObjectFieldsValues(
+async function scanObjectFields(
     fileLine: String,
     objectType: string,
     objectID: string,
@@ -175,11 +190,11 @@ async function scanObjectFieldsValues(
         }
         if (inFieldSection || (noOfOpenBrackets === 1 && fileLine.includes('field'))) {
             if (!inFieldSection && fileLine.includes('field')) {
-                const fieldOrValueID = fileLine.split(';')[0];
+                const fieldID = fileLine.split(';')[0];
                 await registerALFieldOrValueID(
                     objectType,
                     objectID,
-                    fieldOrValueID.substr(fieldOrValueID.indexOf('(') + 1)
+                    fieldID.substr(fieldID.indexOf('(') + 1)
                 );
             }
 
@@ -196,6 +211,37 @@ async function scanObjectFieldsValues(
         }
     }
     return [inFieldsSection, inFieldSection, noOfOpenBrackets];
+}
+
+async function scanObjectValues(
+    fileLine: String,
+    objectType: string,
+    objectID: string,
+    inValueSection: boolean,
+    noOfOpenBrackets: number,
+): Promise<[boolean, number]> {
+    if (fileLine.includes('{')) {
+        noOfOpenBrackets += 1;
+    }
+    if (inValueSection || (noOfOpenBrackets === 1 && fileLine.includes('value'))) {
+        if (!inValueSection && fileLine.includes('value')) {
+            const valueID = fileLine.split(';')[0];
+            await registerALFieldOrValueID(
+                objectType,
+                objectID,
+                valueID.substr(valueID.indexOf('(') + 1)
+            );
+        }
+
+        inValueSection = true;
+        if (fileLine.includes('}')) {
+            inValueSection = false;
+        }
+    }
+    if (fileLine.includes('}')) {
+        noOfOpenBrackets -= 1;
+    }
+    return [inValueSection, noOfOpenBrackets];
 }
 
 async function registerALFieldOrValueID(objectType: string, objectId: string, fieldOrValueID: string): Promise<void> {
