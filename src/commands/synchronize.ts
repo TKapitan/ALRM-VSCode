@@ -68,35 +68,40 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
                 success = false;
             }
         } else {
-            const data = fs.readFileSync(scannedItemWithFullPath, 'utf8').toString();
+            const extPosition = scannedItemWithFullPath.lastIndexOf('.');
+            if (extPosition >= 0 && scannedItemWithFullPath.substr(extPosition) === '.al') {
+                const data = fs.readFileSync(scannedItemWithFullPath, 'utf8').toString();
 
-            let inFieldsSection = false, inFieldSection = false;
-            let noOfOpenBrackets = 0, counter = 0;
-            fileLines = data.split('\n');
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-                try {
-                    fileLine = fileLines[counter];
+                let inFieldsSection = false, inFieldSection = false;
+                let noOfOpenBrackets = 0, counter = 0;
+                fileLines = data.split('\n');
+                // eslint-disable-next-line no-constant-condition
+                while (true) {
+                    try {
+                        fileLine = fileLines[counter];
 
-                    if (!scanForObjectFields) {
-                        // Scan for objects
-                        [scanForObjectFields, objectType, objectID] = await tryScanObject(fileOrDirName, fileLine);
-                    } else {
-                        // Scan for fields or values in extension objects
-                        [inFieldsSection, inFieldSection, noOfOpenBrackets] = await scanObjectFieldsValues(fileLine, objectType, objectID, inFieldsSection, inFieldSection, noOfOpenBrackets);
-                    }
-
-                    counter++;
-                    if (counter > fileLines.length) {
-                        if ((objectType === '' || objectID === '') || (inFieldsSection || inFieldSection || noOfOpenBrackets > 0)) {
-                            throw new Error('File ' + scannedItemWithFullPath + ' is not valid AL file or this file is not well-formated.');
+                        if (!scanForObjectFields) {
+                            // Scan for objects
+                            if (objectType === '' && objectID === '') {
+                                [scanForObjectFields, objectType, objectID] = await tryScanObject(fileOrDirName, fileLine);
+                            }
+                        } else {
+                            // Scan for fields or values in extension objects
+                            [inFieldsSection, inFieldSection, noOfOpenBrackets] = await scanObjectFieldsValues(fileLine, objectType, objectID, inFieldsSection, inFieldSection, noOfOpenBrackets);
                         }
+
+                        counter++;
+                        if (counter >= fileLines.length) {
+                            if ((objectType === '' || (hasObjectTypeIDs(translateObjectType(objectType)) && objectID === '')) || (inFieldsSection || inFieldSection || noOfOpenBrackets > 0)) {
+                                throw new Error('File ' + scannedItemWithFullPath + ' is not valid AL file or this file is not well-formated.');
+                            }
+                            break;
+                        }
+                    } catch (error) {
+                        success = false;
+                        errorStrings += ';\n' + error;
                         break;
                     }
-                } catch (error) {
-                    success = false;
-                    errorStrings += '\n' + error;
-                    break;
                 }
             }
         }
