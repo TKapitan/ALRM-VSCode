@@ -114,15 +114,16 @@ async function tryScanObject(
     fileLine: String,
 ): Promise<[boolean, string, string]> {
     let objectID = '', objectName = '';
-    const objectTypeString: string = fileLine.split(' ')[0];
+    const fileLineBySpace: string[] = fileLine.split(' ');
+    const objectTypeString: string = fileLineBySpace[0];
     const objectType: ObjectType = translateObjectType(objectTypeString);
     if (objectType !== ObjectType.UnKnownObjectType) {
         // Parse object ID & name
         if (hasObjectTypeIDs(objectType)) {
-            objectID = fileLine.split(' ')[1];
-            objectName = fileLine.split(' ')[2];
+            objectID = fileLineBySpace[1];
+            objectName = fileLineBySpace[2];
         } else {
-            objectName = fileLine.split(' ')[1];
+            objectName = fileLineBySpace[1];
         }
 
         if (objectName.charAt(0) === '"') {
