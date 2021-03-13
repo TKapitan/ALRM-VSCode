@@ -10,11 +10,19 @@ Creates an extension record in connected Business Central instance. Id, name and
 
 Based on setup (see Extension Setting) range code may be required during the initialization process. Different object ranges can be specified for range codes in BC. There is also an option to choose a prefix to check all object names before a new id is assigned.
 
-### ALRM: New object extension
+### ALRM: Synchronize (beta)
 
-Creates an extension object record of selected type and name in connected Business Central instance. New untitled file is created and initialized with corresponding standard AL language object snippet and object id assigned by BC.
+Synchoronize is a command that scan all AL files in the project and register all of existing objects (and fields for table and enum extensions). The extension has to be initialized first, than it is possible to run this command (may taky up to 10 minutes based on number of existing AL objects.).
 
-<!-- XXX fix after a repository is added ! [New object command] (images/newObjectCommand.gif) -->
+The project has to met all defined rules on corresponding Assignable Range (object ID range, field ID range, object name structure and object ID and name uniqueness). If there are any error, other objects are synchronized and all errors are showned to the user once the synchronization ends.
+
+The project (all objects) is scanned each time the command is run. The scanning and registering are done synchronously. Deleting of object field/values or deleting of objects is not supported.
+
+### ALRM: New object
+
+Creates object record of selected type and name in connected Business Central instance. New untitled file is created and initialized with corresponding standard AL language object snippet and object id assigned by BC.
+
+Since v0.3.1 the command filter object types based on runtime version specified in app.json (users are not able to choose object type that is not available for project runtime).
 
 ### ALRM: New object extension field or value
 
@@ -32,7 +40,7 @@ To use this extension, the API must provide:
 
 - API endpoints (currently, only ODATA api format is supported)
   - extensions
-    - The API endpoint must process POST create 
+    - The API endpoint must process POST create
       - The create request contains data
         - id
           - Guid
@@ -47,9 +55,9 @@ To use this extension, the API must provide:
         - description
           - String (250 characters)
           - Description of the extension automatically loaded from app.json
-    - The API endpoint must process two actions (POST requests) 
-      - Microsoft.NAV.createObject 
-        - Accept three parameters (newly created object identification) and return ID of the object as a number.
+    - The API endpoint must process two actions (POST requests)
+      - Microsoft.NAV.createObject
+        - Accept three parameters (newly created object identification without the ID) and return ID of the object as a number.
         - Parameters
           - objectType
             - String
@@ -64,8 +72,8 @@ To use this extension, the API must provide:
         - Return Value
           - Number
           - ID of the newly created object, will be automatically inserted to the created object.
-      - Microsoft.NAV.createObjectLine
-        - Accept two parameters (object identification in which the field should be created) and return ID of the field as a number.
+      - Microsoft.NAV.createObjectFieldOrValue (replacing Microsoft.NAV.createObjectLine from v0.3.1)
+        - Accept three parameters (object identification in which the field should be created and user who did the request) and return ID of the field as a number.
         - Parameters
           - objectType
             - String
@@ -74,12 +82,51 @@ To use this extension, the API must provide:
           - objectID
             - String
             - Specifies ID of the object in which we want to create a field.
+          - createBy
+            - String (50 characters)
+            - Specifies user identification who did the request.
         - Return Value
           - Number
           - ID of the newly created field, will be automatically inserted to the created field.
+      - Microsoft.NAV.createObjectWithOwnID
+        - Accept four parameters (newly created object identification with ID). No return value.
+        - Parameters
+          - objectType
+            - String
+            - Specifies type of the newly created object.
+            - In the format of Business Central objects (for example: Table/TableExtension/...).
+          - objectID
+            - String
+            - Specifies ID of the object which we want to register
+          - objectName
+            - String
+            - Specifies name of the newly created object.
+          - createBy
+            - String (50 characters)
+            - Specifies user identification who did the request.
+        - Return Value
+          - Nothing
+      - Microsoft.NAV.createObjectFieldOrValueWithOwnID (new in v0.3.1)
+        - Accept four parameters (object identification in which the field should be created, new field/value ID and user who did the request). No return value.
+        - Parameters
+          - objectType
+            - String
+            - Specifies type of the object in which we want to create a field.
+            - In the format of Business Central objects (for example: Table/TableExtension/...).
+          - objectID
+            - String
+            - Specifies ID of the object in which we want to create a field.
+          - fieldOrValueID
+            - String
+            - Specifies ID of the field or value we want to register
+          - createBy
+            - String (50 characters)
+            - Specifies user identification who did the request.
+        - Return Value
+          - Nothing
   - assignableRanges
     - Is used only when the "Assignable Ranges" is set to "API".
-    - The API endpoint must process GET 
+    - The API endpoint must process GET
       - Without filters
       - Response must contain
         - code
@@ -108,7 +155,8 @@ To use this extension, the API must provide:
 
 ## Known Issues
 
-No known issues
+There are no known major issues
+For list of minor issues and upcoming changes see <https://github.com/TKapitan/ALRM-VSCode/blob/master/CHANGELOG.md#unreleased>
 
 ## Release Notes
 
