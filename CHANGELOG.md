@@ -20,7 +20,7 @@
 Major changes
 
 - New command "ALRM: Synchronize (beta)"
-  - For details see <https://github.com/TKapitan/ALRM-VSCode/blob/master/README.md#alrm-synchronize-(beta)>
+  - For details see <https://github.com/TKapitan/ALRM-VSCode/blob/master/README.md#alrm-synchronize-beta>
 - Modified command: "ALRM: New Object"
   - Users are now able to select only object types that are available for the project runtime (based on runtime setting in app.json)
   - New Validation: the object name must be max 30 chars long
