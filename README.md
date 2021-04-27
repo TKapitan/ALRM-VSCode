@@ -24,6 +24,8 @@ Creates object record of selected type and name in connected Business Central in
 
 Since v0.3.1 the command filter object types based on runtime version specified in app.json (users are not able to choose object type that is not available for project runtime).
 
+![New Object Command](./images/newObjectCommand.gif)
+
 ### ALRM: New object extension field or value
 
 Creates an extension object line record in connected Business Central instance. Only usable in table extensions and enum extensions. Creates a new field or enum value at current cursor position with id provided by BC.
