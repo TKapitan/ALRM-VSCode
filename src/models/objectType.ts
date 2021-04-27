@@ -19,6 +19,7 @@ export enum ObjectType {
     Entitlement = 45,
     Profile = 85,
     Interface = 90,
+    ControlAddin = 95,
 }
 // Specifies original version of AL project runtime for which the object types should be available
 export const originalObjects: ObjectType[] = [
@@ -31,7 +32,8 @@ export const originalObjects: ObjectType[] = [
     ObjectType.Report,
     ObjectType.XMLPort,
     ObjectType.Query,
-    ObjectType.Profile
+    ObjectType.Profile,
+    ObjectType.ControlAddin,
 ];
 export const runtime04Objects: ObjectType[] = [
     ObjectType.Enum,
@@ -55,7 +57,8 @@ const objectsWithoutID: ObjectType[] = [
     ObjectType.PageCustomization,
     ObjectType.Interface,
     ObjectType.Profile,
-    ObjectType.Entitlement
+    ObjectType.Entitlement,
+    ObjectType.ControlAddin,
 ];
 export function hasObjectTypeIDs(objectType: ObjectType): boolean {
     return objectsWithoutID.findIndex(x => x === objectType) === -1;
@@ -65,7 +68,7 @@ export function hasObjectTypeIDs(objectType: ObjectType): boolean {
 const ignoredObjectTypes: ObjectType[] = [
     ObjectType.DotNet
 ];
-export function shouldBeObjectTypeIgnored(objectType: ObjectType): boolean{
+export function shouldBeObjectTypeIgnored(objectType: ObjectType): boolean {
     return ignoredObjectTypes.findIndex(x => x === objectType) !== -1;
 }
 
@@ -97,16 +100,17 @@ export function translateObjectType(fromString: string): ObjectType {
         case 'enumextension':
             return ObjectType.EnumExtension;
         case 'permissionset':
-            return ObjectType.Enum;
-        // TODO PermissionSetExtension has same value as permissionset?
+            return ObjectType.PermissionSet;
         case 'permissionsetextension':
-            return ObjectType.EnumExtension;
+            return ObjectType.PermissionSetExtension;
         case 'profile':
             return ObjectType.Profile;
         case 'interface':
             return ObjectType.Interface;
         case 'dotnet':
             return ObjectType.DotNet;
+        case 'controladdin':
+            return ObjectType.ControlAddin;
     }
     return ObjectType.UnKnownObjectType;
 }
@@ -146,6 +150,8 @@ export function objectTypeSnippetFileName(objectType: ObjectType): string {
             return 'profile.json';
         case ObjectType.Interface:
             return 'interface.json';
+        case ObjectType.ControlAddin:
+            return 'controladdin.json';
         default:
             throw new Error(`Unimplemented type ${objectType}!`);
     }
@@ -214,7 +220,7 @@ export function substituteObjectInfo(
         case ObjectType.PermissionSetExtension:
             return snippetHeader
                 .replace('${1:Id}', objectId)
-                .replace('${2:MyPermissionSet}', `"${objectName}"`);
+                .replace('${2:MyPermissionSetExt}', `"${objectName}"`);
         // TODO There are two snippets for profile in the file
         case ObjectType.Profile:
             return snippetHeader
@@ -222,6 +228,9 @@ export function substituteObjectInfo(
         case ObjectType.Interface:
             return snippetHeader
                 .replace('${1:MyInterface}', `"${objectName}"`);
+        case ObjectType.ControlAddin:
+            return snippetHeader
+                .replace('${1:MyControlAddIn}', `"${objectName}"`);
     }
     throw new Error('Unknown object type: ' + objectType.toString());
 }
