@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 export enum ObjectType {
+    DotNet = -2,
     UnKnownObjectType = -1,
     Table = 5,
     TableExtension = 6,
@@ -60,6 +61,14 @@ export function hasObjectTypeIDs(objectType: ObjectType): boolean {
     return objectsWithoutID.findIndex(x => x === objectType) === -1;
 }
 
+// Specify objects that should not be synchronized
+const ignoredObjectTypes: ObjectType[] = [
+    ObjectType.DotNet
+];
+export function shouldBeObjectTypeIgnored(objectType: ObjectType): boolean{
+    return ignoredObjectTypes.findIndex(x => x === objectType) !== -1;
+}
+
 // Translates object from string value to ObjectType object
 export function translateObjectType(fromString: string): ObjectType {
     switch (fromString) {
@@ -96,6 +105,8 @@ export function translateObjectType(fromString: string): ObjectType {
             return ObjectType.Profile;
         case 'interface':
             return ObjectType.Interface;
+        case 'dotnet':
+            return ObjectType.DotNet;
     }
     return ObjectType.UnKnownObjectType;
 }

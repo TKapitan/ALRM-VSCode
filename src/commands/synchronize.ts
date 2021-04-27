@@ -1,7 +1,7 @@
 import { getCurrentWorkspaceUri } from "../services/fileService";
 import ExtensionService from "../services/extensionService";
 import { showErrorMessage, promptInitialization, showInformationMessage } from "../helpers/userInteraction";
-import { hasObjectTypeIDs, ObjectType, translateObjectType } from "../models/objectType";
+import { hasObjectTypeIDs, ObjectType, shouldBeObjectTypeIgnored, translateObjectType } from "../models/objectType";
 import Extension from "../models/extension";
 import * as vscode from 'vscode';
 import * as fs from "fs";
@@ -56,11 +56,12 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
     let fileLines: string[], fileLine: string;
     let objectType: string, objectID: string;
     let scanForObject;
-    let scanForObjectFields: boolean, scanForObjectValues: boolean;
+    let scanForObjectFields: boolean, scanForObjectValues: boolean, ignoredObjectType: boolean;
     for (const fileOrDirName of files) {
         objectType = '';
         objectID = '';
         scanForObject = true;
+        ignoredObjectType = false;
         scanForObjectValues = false;
         scanForObjectFields = false;
         scannedItemWithFullPath = workspaceFolderPath + '/' + fileOrDirName;
@@ -86,7 +87,11 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
                         if (scanForObject) {
                             // Scan for objects
                             if (scanForObject) {
-                                [objectType, objectID] = await tryScanObject(fileOrDirName, fileLine);
+                                [objectType, objectID, ignoredObjectType] = await tryScanObject(fileOrDirName, fileLine);
+                                if (ignoredObjectType) {
+                                    break;
+                                }
+
                                 if ((objectType !== '' && (!hasObjectTypeIDs(translateObjectType(objectType)) || objectID !== ''))) {
                                     scanForObject = false;
 
@@ -140,12 +145,15 @@ async function scanDirectory(workspaceFolderPath: string): Promise<[boolean, str
 async function tryScanObject(
     fileName: string,
     fileLine: String,
-): Promise<[string, string]> {
+): Promise<[string, string, boolean]> {
     let objectID = '', objectName = '';
     const fileLineBySpace: string[] = fileLine.split(' ');
     const objectTypeString: string = fileLineBySpace[0];
     const objectType: ObjectType = translateObjectType(objectTypeString);
     if (objectType !== ObjectType.UnKnownObjectType) {
+        if (shouldBeObjectTypeIgnored(objectType)) {
+            return ['', '', true];
+        }
         // Parse object ID & name
         if (hasObjectTypeIDs(objectType)) {
             objectID = fileLineBySpace[1];
@@ -168,9 +176,9 @@ async function tryScanObject(
             objectID,
             objectName
         );
-        return [objectTypeString, objectID];
+        return [objectTypeString, objectID, false];
     }
-    return ['', ''];
+    return ['', '', false];
 }
 
 async function scanObjectFields(
