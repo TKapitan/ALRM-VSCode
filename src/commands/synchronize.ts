@@ -189,15 +189,15 @@ async function scanObjectFields(
     inFieldSection: boolean,
     noOfOpenBrackets: number,
 ): Promise<[boolean, boolean, number]> {
-    if (fileLine.toLowerCase().includes('fields')) {
+    if (fileLine.toLowerCase().trimStart().startsWith('fields')) {
         inFieldsSection = true;
     }
     if (inFieldsSection) {
-        if (fileLine.includes('{')) {
+        if (fileLine.trimStart().startsWith('{')) {
             noOfOpenBrackets += 1;
         }
-        if (inFieldSection || (noOfOpenBrackets === 1 && fileLine.toLowerCase().includes('field'))) {
-            if (!inFieldSection && fileLine.toLowerCase().includes('field')) {
+        if (inFieldSection || (noOfOpenBrackets === 1 && fileLine.toLowerCase().trimStart().startsWith('field'))) {
+            if (!inFieldSection && fileLine.toLowerCase().trimStart().startsWith('field')) {
                 const fieldID = fileLine.split(';')[0];
                 await registerALFieldOrValueID(
                     objectType,
@@ -207,11 +207,11 @@ async function scanObjectFields(
             }
 
             inFieldSection = true;
-            if (fileLine.includes('}')) {
+            if (fileLine.trimStart().startsWith('}')) {
                 inFieldSection = false;
             }
         }
-        if (fileLine.includes('}')) {
+        if (fileLine.trimStart().startsWith('}')) {
             noOfOpenBrackets -= 1;
             if (!inFieldSection && noOfOpenBrackets <= 0) {
                 inFieldsSection = false;
@@ -228,11 +228,11 @@ async function scanObjectValues(
     inValueSection: boolean,
     noOfOpenBrackets: number,
 ): Promise<[boolean, number]> {
-    if (fileLine.includes('{')) {
+    if (fileLine.trimStart().startsWith('{')) {
         noOfOpenBrackets += 1;
     }
-    if (inValueSection || (noOfOpenBrackets === 1 && fileLine.toLowerCase().includes('value'))) {
-        if (!inValueSection && fileLine.toLowerCase().includes('value')) {
+    if (inValueSection || (noOfOpenBrackets === 1 && fileLine.toLowerCase().trimStart().startsWith('value'))) {
+        if (!inValueSection && fileLine.toLowerCase().trimStart().startsWith('value')) {
             const valueID = fileLine.split(';')[0];
             await registerALFieldOrValueID(
                 objectType,
@@ -242,11 +242,11 @@ async function scanObjectValues(
         }
 
         inValueSection = true;
-        if (fileLine.includes('}')) {
+        if (fileLine.trimStart().startsWith('}')) {
             inValueSection = false;
         }
     }
-    if (fileLine.includes('}')) {
+    if (fileLine.trimStart().startsWith('}')) {
         noOfOpenBrackets -= 1;
     }
     return [inValueSection, noOfOpenBrackets];
