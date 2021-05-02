@@ -13,6 +13,18 @@
 
 ## [Released Versions]
 
+### v0.3.6
+
+- Date of release: 02/05/2021
+
+Other changes
+
+- The dotnet file (AL dotnet object type) does not cause synchronization error anymore.
+- Add support for Control Addin object type.
+- Improvements to parsing AL files for fields/values in table or enum extension
+- Commented fields/values are not synchronized anymore (which could cause an error during synchronization when the field/value definition was not correct)
+- AL file parsing is now case-insensitive (so object defined with first capital letter is not causing an error now).
+
 ### v0.3.1
 
 - Date of release: 13/03/2021
