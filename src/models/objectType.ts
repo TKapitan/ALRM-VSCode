@@ -74,7 +74,7 @@ export function shouldBeObjectTypeIgnored(objectType: ObjectType): boolean {
 
 // Translates object from string value to ObjectType object
 export function translateObjectType(fromString: string): ObjectType {
-    switch (fromString) {
+    switch (fromString.toLowerCase()) {
         case 'codeunit':
             return ObjectType.Codeunit;
         case 'page':

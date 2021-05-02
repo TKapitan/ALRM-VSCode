@@ -189,15 +189,15 @@ async function scanObjectFields(
     inFieldSection: boolean,
     noOfOpenBrackets: number,
 ): Promise<[boolean, boolean, number]> {
-    if (fileLine.includes('fields')) {
+    if (fileLine.toLowerCase().includes('fields')) {
         inFieldsSection = true;
     }
     if (inFieldsSection) {
         if (fileLine.includes('{')) {
             noOfOpenBrackets += 1;
         }
-        if (inFieldSection || (noOfOpenBrackets === 1 && fileLine.includes('field'))) {
-            if (!inFieldSection && fileLine.includes('field')) {
+        if (inFieldSection || (noOfOpenBrackets === 1 && fileLine.toLowerCase().includes('field'))) {
+            if (!inFieldSection && fileLine.toLowerCase().includes('field')) {
                 const fieldID = fileLine.split(';')[0];
                 await registerALFieldOrValueID(
                     objectType,
@@ -231,8 +231,8 @@ async function scanObjectValues(
     if (fileLine.includes('{')) {
         noOfOpenBrackets += 1;
     }
-    if (inValueSection || (noOfOpenBrackets === 1 && fileLine.includes('value'))) {
-        if (!inValueSection && fileLine.includes('value')) {
+    if (inValueSection || (noOfOpenBrackets === 1 && fileLine.toLowerCase().includes('value'))) {
+        if (!inValueSection && fileLine.toLowerCase().includes('value')) {
             const valueID = fileLine.split(';')[0];
             await registerALFieldOrValueID(
                 objectType,
