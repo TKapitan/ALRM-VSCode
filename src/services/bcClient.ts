@@ -106,7 +106,7 @@ export default class BcClient {
         const response = await this.sendRequest('POST', this.buildUrl(resource, id, actionName), data);
 
         if (response.data === null || typeof response.data !== 'object') {
-            if (typeof response.data === 'string' && response.data === ''){
+            if (typeof response.data === 'string' && response.data === '') {
                 // Calling API that has no return value
                 return '';
             }
@@ -133,10 +133,14 @@ export default class BcClient {
         if (response.status >= 200 && response.status < 300) {
             return response;
         }
-        if (response.data === null) {
+
+        if (response.data !== undefined && response.data.error !== undefined && response.data.error.message !== undefined) {
+            throw new Error(response.data.error.message);
+        } else if (response.status !== undefined) {
+            throw new Error('Response error: Error ' + response.status + ', ' + response.statusText);
+        } else {
             throw new Error('Empty response');
         }
-        throw new Error(response.data.error.message); // TODO if message is null -> show status & statusText (for example 404/Not Found)
     }
 
     private buildUrl(
