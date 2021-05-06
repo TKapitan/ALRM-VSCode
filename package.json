@@ -57,6 +57,15 @@
           ],
           "default": "API",
           "description": "Assignable Ranges"
+        },
+        "al-id-range-manager.integrationApiVersion": {
+          "type": "string",
+          "enum": [
+            "1.0",
+            "1.1"
+          ],
+          "default": "1.0",
+          "description": "Integration API Version"
         }
       }
     },

@@ -259,7 +259,7 @@ async function registerALFieldOrValueID(objectType: string, objectId: string, fi
         extension,
         translateObjectType(objectType),
         +objectId,
-        fieldOrValueID
+        +fieldOrValueID
     );
 }
 
@@ -278,7 +278,7 @@ async function registerALObject(type: string, id: string, name: string): Promise
             extension,
             translateObjectType(type),
             name,
-            id
+            +id
         );
     }
 }

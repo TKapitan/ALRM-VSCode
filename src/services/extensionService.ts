@@ -1,17 +1,21 @@
-import BcClient, { Resources } from "./bcClient";
 import { readAppJson } from "./fileService";
 import Extension from '../models/extension';
-import AssignableRange from '../models/assignableRange';
 import * as vscode from 'vscode';
 import App from "../models/app";
 import { ObjectType } from "../models/objectType";
+import { IIntegrationApi } from "./api/IIntegrationApi";
+import Settings from "./settings";
+import CreateBCExtensionRequest from "./api/requests/createBcExtensionRequest";
+import CreateBCExtensionObjectRequest from "./api/requests/createBcExtensionObjectRequest";
+import CreateBCExtensionObjectLineRequest from "./api/requests/createBcExtensionObjectLineRequest";
+import AssignableRange from "../models/assignableRange";
 
 export default class ExtensionService {
     private static cache: Record<string, Extension> = {};
-    private client: BcClient;
+    private iIntegrationApi: IIntegrationApi;
 
-    constructor(client?: BcClient) {
-        this.client = client ?? new BcClient();
+    constructor() {
+        this.iIntegrationApi = Settings.instance.integrationApi;
     }
 
     public async getExtension(workspace: vscode.Uri): Promise<Extension | null> {
@@ -20,7 +24,7 @@ export default class ExtensionService {
         }
         const app = readAppJson(workspace);
 
-        const extension = await this.getBcExtension(app.id);
+        const extension = await this.iIntegrationApi.getBcExtension(app.id);
         if (extension === null) {
             return null;
         }
@@ -29,108 +33,44 @@ export default class ExtensionService {
     }
 
     public async createExtension(workspace: vscode.Uri, app: App, rangeCode?: string): Promise<Extension> {
-        let extension;
-        if (rangeCode === null) {
-            extension = await this.createBcExtension({
-                id: app.id,
-                name: app.name.substring(0, 50),
-                description: app.description.substr(0, 250),
-            });
-        } else {
-            extension = await this.createBcExtension({
-                id: app.id,
-                rangeCode: rangeCode,
-                name: app.name.substring(0, 50),
-                description: app.description.substr(0, 250),
-            });
-        }
+        const createBCExtensionRequest = new CreateBCExtensionRequest(
+            app.id,
+            rangeCode ?? '',
+            app.name.substring(0, 50),
+            app.description.substr(0, 250)
+        );
+        const extension = await this.iIntegrationApi.createBcExtension(createBCExtensionRequest);
         ExtensionService.cache[workspace.fsPath] = extension;
         return extension;
     }
 
-    public async createExtensionObject(extension: Extension | null, objectType: ObjectType, objectName: string, existingObjectId = ''): Promise<number> {
+    public async createExtensionObject(extension: Extension | null, objectType: ObjectType, objectName: string, existingObjectId = 0): Promise<number> {
         if (extension === null) {
             throw new Error('Can not create extension object for unknown extension.');
         }
-
-        let response;
-        if (existingObjectId !== '') {
-            response = await this.client.callAction(Resources.extension, extension.code, 'createObjectWithOwnID', {
-                objectType: objectType.toString(),
-                objectID: +existingObjectId,
-                objectName: objectName,
-                createdBy: this.client.username?.substr(0, 50) ?? '',
-            });//.catch(
-            //    error => { throw new Error(`Synchronization failed: ${error}`); }
-            //);
-            return +existingObjectId;
-        } else {
-            response = await this.client.callAction(Resources.extension, extension.code, 'createObject', {
-                objectType: objectType.toString(),
-                objectName: objectName,
-                createdBy: this.client.username?.substr(0, 50) ?? '',
-            });//.catch(
-            //    error => { throw new Error(`Synchronization failed: ${error}`); }
-            //);
-
-            const objectId = Number(response);
-            if (isNaN(objectId)) {
-                throw new Error(`Unexpected object id response: ${response}`);
-            }
-            return objectId;
-        }
+        const createBCExtensionObjectRequest = new CreateBCExtensionObjectRequest(
+            extension,
+            objectType.toString(),
+            existingObjectId,
+            objectName,
+        );
+        return await this.iIntegrationApi.createBcExtensionObject(createBCExtensionObjectRequest);
     }
 
-    public async createExtensionObjectLine(extension: Extension | null, objectType: ObjectType, objectId: number, existingFieldOrValueId = ''): Promise<number | null> {
+    public async createExtensionObjectLine(extension: Extension | null, objectType: ObjectType, objectId: number, existingFieldOrValueId = 0): Promise<number | null> {
         if (extension === null) {
             throw new Error('Can not create extension object line for unknown extension.');
         }
-
-        if (existingFieldOrValueId !== '') {
-            await this.client.callAction(Resources.extension, extension.code, 'createObjectFieldOrValueWithOwnID', {
-                objectType: objectType.toString(),
-                objectID: objectId.toString(),
-                fieldOrValueID: existingFieldOrValueId,
-                createdBy: this.client.username?.substr(0, 50) ?? '',
-            });
-            return null;
-        } else {
-            const response = await this.client.callAction(Resources.extension, extension.code, 'createObjectFieldOrValue', {
-                objectType: objectType.toString(),
-                objectID: objectId.toString(),
-                createdBy: this.client.username?.substr(0, 50) ?? '',
-            });
-
-            const objectLineId = Number(response);
-            if (isNaN(objectLineId)) {
-                throw new Error(`Unexpected object id response: ${response}`);
-            }
-            return objectLineId;
-        }
-    }
-
-    private async getBcExtension(id: string): Promise<Extension | null> {
-        const extensions = await this.client.readMultiple(Resources.extension, {
-            top: 1,
-            filter: `id eq ${id}`
-        });
-
-        if (extensions.length === 0) {
-            return null;
-        }
-
-        return Extension.fromJson(extensions[0]);
-    }
-
-    private async createBcExtension(data: Object): Promise<Extension> {
-        const extension = await this.client.create(Resources.extension, data);
-
-        return Extension.fromJson(extension);
+        const createBCExtensionObjectLineRequest = new CreateBCExtensionObjectLineRequest(
+            extension,
+            objectType.toString(),
+            objectId,
+            existingFieldOrValueId,
+        );
+        return await this.iIntegrationApi.createBcExtensionObjectLine(createBCExtensionObjectLineRequest);
     }
 
     public async getAllAssignableRanges(): Promise<AssignableRange[]> {
-        const assignableRanges = await this.client.readAll(Resources.assignableRange);
-
-        return assignableRanges.map(e => AssignableRange.fromJson(e));
+        return await this.iIntegrationApi.getAllAssignableRanges();
     }
 }
