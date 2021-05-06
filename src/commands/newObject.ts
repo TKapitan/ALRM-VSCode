@@ -3,6 +3,7 @@ import { getUserInput, getUserSelection, promptInitialization, showErrorMessage 
 import { ObjectType, originalObjects, runtime04Objects, runtime05Objects, runtime06Objects, runtime07Objects, substituteObjectInfo } from '../models/objectType';
 import ExtensionService from '../services/extensionService';
 import { getCurrentWorkspaceUri, readAppJson, readSnippetFile } from '../services/fileService';
+import { QuickPickItem } from 'vscode';
 
 export default async function newObjectCommand(): Promise<void> {
     try {
@@ -48,7 +49,6 @@ export default async function newObjectCommand(): Promise<void> {
 }
 
 async function promptObjectSelection(): Promise<ObjectType | undefined> {
-    const items: string[] = [];
 
     const workspaceUri = getCurrentWorkspaceUri();
     const app = readAppJson(workspaceUri);
@@ -65,15 +65,18 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
     if (app.runtime >= '7.0') {
         objectTypesArray = objectTypesArray.concat(runtime07Objects);
     }
+    
+    const items: QuickPickItem[] = [];
     for (const objectTypeID of objectTypesArray) {
-        items.push(ObjectType[objectTypeID]);
+        items.push({
+            'label': ObjectType[objectTypeID],
+        });
     }
-    const selection = await getUserSelection(items);
-    if (selection === undefined) {
+    const selectedObjectType = await getUserSelection(items);
+    if (selectedObjectType?.label === undefined) {
         return undefined;
     }
-
-    return ObjectType[selection as keyof typeof ObjectType];
+    return ObjectType[selectedObjectType?.label as keyof typeof ObjectType];
 }
 
 async function createObjectFile(

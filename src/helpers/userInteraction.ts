@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
+import { QuickPickItem } from 'vscode';
 import { CONFIG_KEY } from '../services/settings';
+
 
 export async function showInformationMessage(message: string, items?: string[]): Promise<string | undefined> {
     return await vscode.window.showInformationMessage(message, ...(items ?? []));
@@ -27,7 +29,7 @@ export async function getUserInput(prompt?: string): Promise<string | undefined>
     return await vscode.window.showInputBox({ prompt: prompt });
 }
 
-export async function getUserSelection(items: string[]): Promise<string | undefined> {
+export async function getUserSelection(items: QuickPickItem[]): Promise<QuickPickItem | undefined> {
     return await vscode.window.showQuickPick(items);
 }
 
