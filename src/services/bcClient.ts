@@ -162,7 +162,10 @@ export default class BcClient {
             url += `/Microsoft.NAV.${actionName}`;
         }
 
-        url += '?tenant=default';
+        const tenant = this.settings.apiTenant;
+        if (tenant !== '') {
+            url += '?tenant=' + tenant;
+        }
         if (queryParameters !== undefined) {
             const parameters: string[] = [];
             if (queryParameters.top !== undefined) {

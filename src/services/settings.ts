@@ -8,6 +8,7 @@ export const AUTH_TYPE_BASIC = 'Basic';
 
 export default class Settings {
     private _apiBaseUrl?: string;
+    private _apiTenant?: string;
     private _apiUsername?: string;
     private _apiPassword?: string;
     private _authenticationType?: string;
@@ -16,6 +17,7 @@ export default class Settings {
     private static _instance: Settings;
 
     public get apiBaseUrl(): string { return this._apiBaseUrl || ''; }
+    public get apiTenant(): string { return this._apiTenant || ''; }
     public get apiUsername(): string { return this._apiUsername || ''; }
     public get apiPassword(): string { return this._apiPassword || ''; }
     public get authenticationType(): string { return this._authenticationType || ''; }
@@ -34,6 +36,7 @@ export default class Settings {
         const config = vscode.workspace.getConfiguration(CONFIG_KEY);
 
         this._apiBaseUrl = config.get('baseUrl');
+        this._apiTenant = config.get('tenant');
         this._apiUsername = config.get('username');
         this._apiPassword = config.get('password');
         this._authenticationType = config.get('authenticationType');
