@@ -6,12 +6,28 @@
 - Allow to change which Snippets will be used to create a new object.
 - Add support for other possible types of authentification
 - Add support for deleting fields and objects for Synchronize command
-- Add support for other tenants in API call from "default"
 - Improving Synchronize command to be quicker (do directory scanning and object scanning asynchronously)
 - Autosynchronize once the project is initialized using "ALRM: Initialize"
 - More validation directly in VS on field/object ranges
 
 ## [Released Versions]
+
+### v0.4.1
+
+- Date of release: 10/05/2021
+
+Major changes
+
+- Added support for v1.1 APIs; the default version is still v1.0 (user can change API version in VS Code Setting).
+- If the v1.1 API version is selected, the name of an extended object using the newly created extension object type is synchronised to BC. The name is synchronised only during synchronisation (not during the creation of a new AL object).
+- When the new extension is initialised, the list of available assignable ranges contain more description loaded from BC API (See [Issue #12](https://github.com/TKapitan/ALRM-VSCode/issues/12))
+- Default assignable range (info loaded from assignable ranges API) is now shown as a first item during extension initialisation (See [Issue #14](https://github.com/TKapitan/ALRM-VSCode/issues/14)).
+- The processing of API calls was refactored. It is possible to select (by the user directly in VS Code setup) which API version should be used. The API versions are implemented using the default interface, and the newer version extends the older ones.
+
+Other changes
+
+- It is possible to connect to BC hosted on different tenant from default. User can specify tenant directly in VS Code Setup. (See [Issue #7](https://github.com/TKapitan/ALRM-VSCode/issues/7))
+- Fix of error message when the API base URL not found (See [Issue #5](https://github.com/TKapitan/ALRM-VSCode/issues/5))
 
 ### v0.3.6
 

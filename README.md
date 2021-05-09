@@ -68,6 +68,9 @@ To use this extension, the API must provide:
           - objectName
             - String
             - Specifies name of the newly created object.
+          - extendsObjectName (since v1.1)
+            - String
+            - Specifies name of object that is extended by newly created extension object. The field must be filled in for extension objects only.
           - createBy
             - String (50 characters)
             - Specifies user identification who did the request.
@@ -103,6 +106,9 @@ To use this extension, the API must provide:
           - objectName
             - String
             - Specifies name of the newly created object.
+          - extendsObjectName (since v1.1)
+            - String
+            - Specifies name of object that is extended by newly created extension object. The field must be filled in for extension objects only.
           - createBy
             - String (50 characters)
             - Specifies user identification who did the request.
@@ -135,13 +141,27 @@ To use this extension, the API must provide:
           - String
           - Identification of assignable ranges that could be used for creating a new extension.
           - The value is later used as a parameter "rangeCode" in the "extensions" API endpoint for POST create method.
+      - Response can also contain some other useful information. These fields are not necessary. All these fields are used for description when new extension is initialized and user is asked to choose the assignable range. Default assignable range is shown first (as default).
+        - description
+          - String
+        - defaultObjectRangeFrom
+          - Number
+        - defaultObjectRangeTo
+          - Number
+        - default
+          - String
 
 ## Extension Settings
 
-- **al-id-range-manager.baseUrl**: API Base URL  
-  - Specifies URL of the APIs
+- **al-id-range-manager.baseUrl**: DEPRECATED: Base Url Without Version  
+  - Specifies URL of the APIs without specific API version
   - Format (for usage with Microsoft Dynamics 365 Business Central)
-    - `https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/`
+    - `https://{server}:{port}/{instance}/api/teamARTAAAE/extension/`
+- **al-id-range-manager.apiVersion**: API Version
+  - Specifies version of used API. The API version must be available in BC.
+  - In the Business Central it is possible to define minimal used API version for communication. In that case, lower/older versions can not be used and hence this setting must be changed by user to the newer version.
+- **al-id-range-manager.tenant**: Tenant
+  - Specifies tenant on which the API is hosted. Default value is "default".
 - **al-id-range-manager.authenticationType**: API Authentication Type
   - Specifies type of the authentification the API require
   - Basic auth is the only currently supported authentification method.
@@ -154,6 +174,14 @@ To use this extension, the API must provide:
   - Values
     - API: Using this value, the assignable range will be mandatory.
     - Do Not Use: Using this value, the assignable range will be skipped.
+
+### Deprecated Settings (still available)
+
+- **al-id-range-manager.baseUrl**: DEPRECATED: Base URL  
+  - DEPRECATED SINCE 0.4.1, will be removed 2021/Q3.
+  - Specifies URL of the APIs
+  - Format (for usage with Microsoft Dynamics 365 Business Central)
+    - `https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/`
 
 ## Known Issues
 
