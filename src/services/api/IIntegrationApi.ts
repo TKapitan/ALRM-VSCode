@@ -5,6 +5,8 @@ import CreateBCExtensionObjectRequest from "./requests/createBcExtensionObjectRe
 import CreateBCExtensionRequest from "./requests/createBcExtensionRequest";
 
 export interface IIntegrationApi {
+    getApiVersionURLFormatted(): string;
+    
     getBcExtension(id: string): Promise<Extension | null>;
     createBcExtension(createBCExtensionRequest: CreateBCExtensionRequest): Promise<Extension>;
     createBcExtensionObject(createBCExtensionObjectRequest: CreateBCExtensionObjectRequest): Promise<number>;

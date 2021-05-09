@@ -6,5 +6,9 @@ export default class IntegrationApiv1n1 extends IntegrationApiv1n0 implements II
         return this._instance || (this._instance = new this());
     }
 
+    public getApiVersionURLFormatted(): string {
+        return 'v1.1';
+    }
+
     // TODO Add new implementation
 }

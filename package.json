@@ -29,7 +29,21 @@
         "al-id-range-manager.baseUrl": {
           "type": "string",
           "default": "",
-          "description": "API Base URL (for the Business Central API: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/)"
+          "description": "!!!DEPRECATED!!! API Base URL (for the Business Central API: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/)"
+        },
+        "al-id-range-manager.baseUrlWithoutVersion": {
+          "type": "string",
+          "default": "",
+          "description": "API Base URL without version (for example: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/)"
+        },
+        "al-id-range-manager.apiVersion": {
+          "type": "string",
+          "enum": [
+            "1.0",
+            "1.1"
+          ],
+          "default": "1.0",
+          "description": "API Version"
         },
         "al-id-range-manager.tenant": {
           "type": "string",
@@ -62,15 +76,6 @@
           ],
           "default": "API",
           "description": "Assignable Ranges"
-        },
-        "al-id-range-manager.integrationApiVersion": {
-          "type": "string",
-          "enum": [
-            "1.0",
-            "1.1"
-          ],
-          "default": "1.0",
-          "description": "Integration API Version"
         }
       }
     },

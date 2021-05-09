@@ -9,7 +9,7 @@ import CreateBCExtensionRequest from "./requests/createBcExtensionRequest";
 
 export default class IntegrationApiv1n0 implements IIntegrationApi {
     protected static _instance: IIntegrationApi;
-    
+
     public static get instance(): IIntegrationApi {
         if (this._instance === undefined) {
             this._instance = new this();
@@ -17,7 +17,11 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
         return this._instance;
     }
 
-    private bcClient(): BcClient{
+    public getApiVersionURLFormatted(): string {
+        return 'v1.0';
+    }
+
+    private bcClient(): BcClient {
         return new BcClient();
     }
 

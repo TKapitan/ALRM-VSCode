@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { showWarningMessage } from '../helpers/userInteraction';
 import { IIntegrationApi } from './api/IIntegrationApi';
 import IntegrationApiv1n0 from './api/IntegrationApiv1n0';
 import IntegrationApiv1n1 from './api/IntegrationApiv1n1';
@@ -35,15 +36,6 @@ export default class Settings {
     private parseConfig() {
         const config = vscode.workspace.getConfiguration(CONFIG_KEY);
 
-        this._apiBaseUrl = config.get('baseUrl');
-        this._apiTenant = config.get('tenant');
-        this._apiUsername = config.get('username');
-        this._apiPassword = config.get('password');
-        this._authenticationType = config.get('authenticationType');
-        this._useAssignableRange = false;
-        if (config.get('assignableRange') === 'API') {
-            this._useAssignableRange = true;
-        }
         switch (config.get('integrationApiVersion')) {
             case '1.1':
                 this._integrationApi = IntegrationApiv1n1.instance;
@@ -51,6 +43,26 @@ export default class Settings {
             default:
                 this._integrationApi = IntegrationApiv1n0.instance;
                 break;
+        }
+        this._apiBaseUrl = config.get('baseUrlWithoutVersion');
+        if (this._apiBaseUrl !== '') {
+            if(!this._apiBaseUrl?.endsWith('/')){
+                this._apiBaseUrl += '/';
+            }
+            this._apiBaseUrl += this._integrationApi.getApiVersionURLFormatted() + '/';
+        } else {
+            this._apiBaseUrl = config.get('baseUrl');
+            if (this._apiBaseUrl !== '') {
+                showWarningMessage('API Base URL is deprecated. Please update settings - set API Base URL without version field and clear API Base URL field!');
+            }
+        }
+        this._apiTenant = config.get('tenant');
+        this._apiUsername = config.get('username');
+        this._apiPassword = config.get('password');
+        this._authenticationType = config.get('authenticationType');
+        this._useAssignableRange = false;
+        if (config.get('assignableRange') === 'API') {
+            this._useAssignableRange = true;
         }
     }
 
