@@ -72,6 +72,18 @@ export function shouldBeObjectTypeIgnored(objectType: ObjectType): boolean {
     return ignoredObjectTypes.findIndex(x => x === objectType) !== -1;
 }
 
+// Specify objects that extends another objects
+const extensionObjectTypes: ObjectType[] = [
+    ObjectType.TableExtension,
+    ObjectType.PageExtension,
+    ObjectType.ReportExtension,
+    ObjectType.EnumExtension,
+    ObjectType.PermissionSetExtension,
+];
+export function extendsAnotherObject(objectType: ObjectType): boolean {
+    return extensionObjectTypes.findIndex(x => x === objectType) !== -1;
+}
+
 // Translates object from string value to ObjectType object
 export function translateObjectType(fromString: string): ObjectType {
     switch (fromString.toLowerCase()) {

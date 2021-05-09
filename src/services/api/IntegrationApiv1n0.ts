@@ -21,7 +21,7 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
         return 'v1.0';
     }
 
-    private bcClient(): BcClient {
+    protected bcClient(): BcClient {
         return new BcClient();
     }
 

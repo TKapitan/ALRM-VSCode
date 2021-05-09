@@ -1,10 +1,11 @@
 import { getCurrentWorkspaceUri } from "../services/fileService";
 import ExtensionService from "../services/extensionService";
 import { showErrorMessage, promptInitialization, showInformationMessage } from "../helpers/userInteraction";
-import { hasObjectTypeIDs, ObjectType, shouldBeObjectTypeIgnored, translateObjectType } from "../models/objectType";
+import { extendsAnotherObject, hasObjectTypeIDs, ObjectType, shouldBeObjectTypeIgnored, translateObjectType } from "../models/objectType";
 import Extension from "../models/extension";
 import * as vscode from 'vscode';
 import * as fs from "fs";
+import CreateBCExtensionObjectRequest from "../services/api/requests/createBcExtensionObjectRequest";
 
 let extension: Extension | null;
 export default async function synchronizeCommand(): Promise<void> {
@@ -146,8 +147,9 @@ async function tryScanObject(
     fileName: string,
     fileLine: String,
 ): Promise<[string, string, boolean]> {
-    let objectID = '', objectName = '';
+    let objectID = '', objectName = '', extendsObjectName = '', tempString = '';
     const fileLineBySpace: string[] = fileLine.split(' ');
+    const fileLineByQuotationMark: string[] = fileLine.split('"');
     const objectTypeString: string = fileLineBySpace[0];
     const objectType: ObjectType = translateObjectType(objectTypeString);
     if (objectType !== ObjectType.UnKnownObjectType) {
@@ -162,20 +164,52 @@ async function tryScanObject(
             objectName = fileLineBySpace[1];
         }
 
+        // Object name could have spaces in name, than it is marked with "
+        const extendsObject = extendsAnotherObject(objectType);
         if (objectName.charAt(0) === '"') {
-            objectName = fileLine.split('"')[1];
+            objectName = fileLineByQuotationMark[1];
+            if (extendsObject) {
+                for (let counter = 2; counter < fileLineByQuotationMark.length; counter++) {
+                    tempString += fileLineByQuotationMark[counter];
+                    if (fileLineByQuotationMark.length -1 !== 2) {
+                        tempString += '"';
+                    }
+                }
+                tempString = tempString.trim();
+                extendsObjectName = tempString.split(' ')[1];
+            }
+        } else if (extendsObject) {
+            for (let counter = 4; counter < fileLineBySpace.length; counter++) {
+                tempString += fileLineBySpace[counter];
+            }
+            tempString = tempString.trim();
+            extendsObjectName = fileLineBySpace[4];
+        }
+        if (extendsObject) {
+            // Extended object name could have spaces in name, than it is marked with "
+            if (extendsObjectName.charAt(0) === '"') {
+                extendsObjectName = tempString.split('"')[1];
+            }
         }
 
-        if (objectName === '' || (objectID === '' && hasObjectTypeIDs(objectType))) {
+        if (objectName === '' || (objectID === '' && hasObjectTypeIDs(objectType)) || (extendsObjectName === '' && extendsObject)) {
             throw new Error('File ' + fileName + ' is not well-formated.');
         }
 
         // Register object
-        await registerALObject(
-            objectTypeString,
-            objectID,
-            objectName
+        const service = new ExtensionService();
+        if (extension === null) {
+            throw new Error('Can not create extension object for unknown extension.');
+        }
+        const createBCExtensionObjectRequest = new CreateBCExtensionObjectRequest(
+            extension,
+            translateObjectType(objectTypeString).toString(),
+            +objectID,
+            objectName,
+            extendsObjectName,
         );
+        console.log('Registering Object type: ' + createBCExtensionObjectRequest.objectType + ', object ID: ' + createBCExtensionObjectRequest.objectID + ', object name: ' + createBCExtensionObjectRequest.objectName);
+        await service.createExtensionObject(createBCExtensionObjectRequest);
         return [objectTypeString, objectID, false];
     }
     return ['', '', false];
@@ -262,24 +296,3 @@ async function registerALFieldOrValueID(objectType: string, objectId: string, fi
         +fieldOrValueID
     );
 }
-
-async function registerALObject(type: string, id: string, name: string): Promise<void> {
-    const service = new ExtensionService();
-    if (id === '') {
-        console.log('Object type: ' + translateObjectType(type).toString() + ', object name: ' + name);
-        await service.createExtensionObject(
-            extension,
-            translateObjectType(type),
-            name
-        );
-    } else {
-        console.log('Object type: ' + translateObjectType(type).toString() + ', object ID: ' + id + ', object name: ' + name);
-        await service.createExtensionObject(
-            extension,
-            translateObjectType(type),
-            name,
-            +id
-        );
-    }
-}
-

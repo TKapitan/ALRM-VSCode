@@ -15,7 +15,7 @@ export default class ExtensionService {
     private iIntegrationApi: IIntegrationApi;
 
     constructor() {
-        this.iIntegrationApi = Settings.instance.integrationApi;
+            this.iIntegrationApi = Settings.instance.integrationApi;
     }
 
     public async getExtension(workspace: vscode.Uri): Promise<Extension | null> {
@@ -44,16 +44,7 @@ export default class ExtensionService {
         return extension;
     }
 
-    public async createExtensionObject(extension: Extension | null, objectType: ObjectType, objectName: string, existingObjectId = 0): Promise<number> {
-        if (extension === null) {
-            throw new Error('Can not create extension object for unknown extension.');
-        }
-        const createBCExtensionObjectRequest = new CreateBCExtensionObjectRequest(
-            extension,
-            objectType.toString(),
-            existingObjectId,
-            objectName,
-        );
+    public async createExtensionObject(createBCExtensionObjectRequest: CreateBCExtensionObjectRequest): Promise<number> {
         return await this.iIntegrationApi.createBcExtensionObject(createBCExtensionObjectRequest);
     }
 

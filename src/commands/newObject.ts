@@ -4,6 +4,7 @@ import { ObjectType, originalObjects, runtime04Objects, runtime05Objects, runtim
 import ExtensionService from '../services/extensionService';
 import { getCurrentWorkspaceUri, readAppJson, readSnippetFile } from '../services/fileService';
 import { QuickPickItem } from 'vscode';
+import CreateBCExtensionObjectRequest from '../services/api/requests/createBcExtensionObjectRequest';
 
 export default async function newObjectCommand(): Promise<void> {
     try {
@@ -36,7 +37,15 @@ export default async function newObjectCommand(): Promise<void> {
             showErrorMessage('Maximal lenght of AL Object name has to be 30 chars.');
         }
 
-        const newObjectId = await service.createExtensionObject(extension, objectType, objectName);
+
+        const createBCExtensionObjectRequest = new CreateBCExtensionObjectRequest(
+            extension,
+            objectType.toString(),
+            0,
+            objectName,
+            ''
+        );
+        const newObjectId = await service.createExtensionObject(createBCExtensionObjectRequest);
         if (newObjectId === null) {
             showErrorMessage('New object could not be created!');
             return;
@@ -65,7 +74,7 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
     if (app.runtime >= '7.0') {
         objectTypesArray = objectTypesArray.concat(runtime07Objects);
     }
-    
+
     const items: QuickPickItem[] = [];
     for (const objectTypeID of objectTypesArray) {
         items.push({

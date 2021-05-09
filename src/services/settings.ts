@@ -36,7 +36,8 @@ export default class Settings {
     private parseConfig() {
         const config = vscode.workspace.getConfiguration(CONFIG_KEY);
 
-        switch (config.get('integrationApiVersion')) {
+        const selectedApiVersion = config.get('apiVersion');
+        switch (selectedApiVersion) {
             case '1.1':
                 this._integrationApi = IntegrationApiv1n1.instance;
                 break;
