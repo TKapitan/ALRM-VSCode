@@ -12,6 +12,14 @@
 
 ## [Released Versions]
 
+### v0.4.2
+
+- Date of release: 11/05/2021
+
+Fixes
+
+- New Enum does not contain assigned ID (See [Issue #6 from BC repo](https://github.com/TKapitan/ALRM-BusinessCentral/issues/6))
+
 ### v0.4.1
 
 - Date of release: 10/05/2021
