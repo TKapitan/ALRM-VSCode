@@ -176,6 +176,7 @@ export function substituteObjectInfo(
     objectName: string,
     objectId: string,
 ): string {
+    // TODO the replace should be case-insensitive
     switch (objectType) {
         case ObjectType.Codeunit:
             return snippetHeader
@@ -218,7 +219,7 @@ export function substituteObjectInfo(
                 .replace('${2:MyXmlport}', `"${objectName}"`);
         case ObjectType.Enum:
             return snippetHeader
-                .replace('${1:Id}', objectId)
+                .replace('${1:id}', objectId)
                 .replace('${2:MyEnum}', `"${objectName}"`);
         // XXX default enum extension snippet contains value snippet
         case ObjectType.EnumExtension:
