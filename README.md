@@ -10,7 +10,7 @@ Creates an extension record in connected Business Central instance. Id, name and
 
 Based on setup (see Extension Setting) range code may be required during the initialization process. Different object ranges can be specified for range codes in BC. There is also an option to choose a prefix to check all object names before a new id is assigned.
 
-### ALRM: Synchronize (beta)
+### ALRM: Synchronize
 
 Synchoronize is a command that scan all AL files in the project and register all of existing objects (and fields for table and enum extensions). The extension has to be initialized first, than it is possible to run this command (may taky up to 10 minutes based on number of existing AL objects.).
 

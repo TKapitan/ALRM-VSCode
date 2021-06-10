@@ -91,7 +91,7 @@
       },
       {
         "command": "al-id-range-manager.synchronize",
-        "title": "ALRM: Synchronize (beta)"
+        "title": "ALRM: Synchronize"
       },
       {
         "command": "al-id-range-manager.newObject",

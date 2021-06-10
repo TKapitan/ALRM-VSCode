@@ -55,8 +55,8 @@ Other changes
 
 Major changes
 
-- New command "ALRM: Synchronize (beta)"
-  - For details see <https://github.com/TKapitan/ALRM-VSCode/blob/master/README.md#alrm-synchronize-beta>
+- New command "ALRM: Synchronize"
+  - For details see <https://github.com/TKapitan/ALRM-VSCode/blob/master/README.md#alrm-synchronize>
 - Modified command: "ALRM: New Object"
   - Users are now able to select only object types that are available for the project runtime (based on runtime setting in app.json)
   - New Validation: the object name must be max 30 chars long
@@ -65,8 +65,8 @@ Major changes
   - New supported object types: ReportExtension, PermissionSet, PermissionSetExtension, Entitlement
 - Changes to required API background
   - Microsoft.NAV.createObjectFieldOrValue for obtaining field IDs in "ALRM: New object extension field or value" command. Replace old command Microsoft.NAV.createObjectLine that is not called anymore).
-  - Microsoft.NAV.createObjectFieldOrValueWithOwnID for registering existing fields (with already assigned field/value ID) using "ALRM: Synchronize (beta)" command.
-  - Microsoft.NAV.createObjectWithOwnID for registering existing objects (with already assigned object ID) using "ALRM: Synchronize (beta)" command.
+  - Microsoft.NAV.createObjectFieldOrValueWithOwnID for registering existing fields (with already assigned field/value ID) using "ALRM: Synchronize" command.
+  - Microsoft.NAV.createObjectWithOwnID for registering existing objects (with already assigned object ID) using "ALRM: Synchronize" command.
 
 Other changes
 
