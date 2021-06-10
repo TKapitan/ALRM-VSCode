@@ -149,6 +149,7 @@ export default class BcClient {
         actionName?: string,
         queryParameters?: QueryParameters,
     ): string {
+        let urlParamDelim = '?';
         let url: string = this.baseUrl;
         if (!url.endsWith('/')) {
             url += '/';
@@ -164,7 +165,8 @@ export default class BcClient {
 
         const tenant = this.settings.apiTenant;
         if (tenant !== '') {
-            url += '?tenant=' + tenant;
+            url += (urlParamDelim + 'tenant=' + tenant);
+            urlParamDelim = '&';
         }
         if (queryParameters !== undefined) {
             const parameters: string[] = [];
@@ -179,7 +181,7 @@ export default class BcClient {
             }
 
             if (parameters.length !== 0) {
-                url += '&' + parameters.join('&');
+                url += (urlParamDelim + parameters.join('&'));
             }
         }
         return url;
