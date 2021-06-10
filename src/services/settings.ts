@@ -51,6 +51,10 @@ export default class Settings {
                 this._apiBaseUrl += '/';
             }
             this._apiBaseUrl += this._integrationApi.getApiVersionURLFormatted() + '/';
+            const companyId = config.get('companyId');
+            if (companyId !== '') {
+                this._apiBaseUrl += 'companies(' + companyId + ')/';
+            }
         } else {
             this._apiBaseUrl = config.get('baseUrl');
             if (this._apiBaseUrl !== '') {

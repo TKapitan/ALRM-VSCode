@@ -154,14 +154,22 @@ To use this extension, the API must provide:
 ## Extension Settings
 
 - **al-id-range-manager.baseUrl**: DEPRECATED: Base Url Without Version  
-  - Specifies URL of the APIs without specific API version
-  - Format (for usage with Microsoft Dynamics 365 Business Central)
+  - Specifies URL of the APIs without specific API version and/or company
+  - Format (for usage with Microsoft Dynamics 365 Business Central On-Premises)
     - `https://{server}:{port}/{instance}/api/teamARTAAAE/extension/`
+  - Format (for usage with Microsoft Dynamics 365 Business Central Online / Cloud)
+    - `https://api.businesscentral.dynamics.com/v2.0/{domain}/{environment}/api/teamARTAAAE/extension/`
+    - Example:
+      - `https://api.businesscentral.dynamics.com/v2.0/kepty.cz/production/api/teamARTAAAE/extension/`
 - **al-id-range-manager.apiVersion**: API Version
   - Specifies version of used API. The API version must be available in BC.
   - In the Business Central it is possible to define minimal used API version for communication. In that case, lower/older versions can not be used and hence this setting must be changed by user to the newer version.
 - **al-id-range-manager.tenant**: Tenant
   - Specifies tenant on which the API is hosted. Default value is "default".
+- **al-id-range-manager.companyId**: Company Id
+  - Specifies ID of the company for API URL. The value must be company ID without leading/ending "{}".
+  - If there are only one company accessible with provided authentification, the value can be blank.
+  - If the instance's default company should be used, the value can be also blank.
 - **al-id-range-manager.authenticationType**: API Authentication Type
   - Specifies type of the authentification the API require
   - Basic auth is the only currently supported authentification method.

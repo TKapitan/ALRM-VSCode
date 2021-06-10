@@ -48,7 +48,12 @@
         "al-id-range-manager.tenant": {
           "type": "string",
           "default": "default",
-          "description": "API Tenant (specifies tenant on which the API is hosted)"
+          "description": "API Tenant (Specifies tenant on which the API is hosted.)"
+        },
+        "al-id-range-manager.companyId": {
+          "type": "string",
+          "default": "",
+          "description": "API Company Id (Specifies the ID of the company for API URL. If connecting to the instance's default company, the field can be blank.)"
         },
         "al-id-range-manager.authenticationType": {
           "type": "string",
