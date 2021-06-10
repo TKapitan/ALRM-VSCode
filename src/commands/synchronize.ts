@@ -32,13 +32,13 @@ export default async function synchronizeCommand(): Promise<void> {
             cancellable: false
         }, async (progress) => {
             const [success, errors] = await scanDirectory(workspaceFolderPath);
+            progress.report({ increment: 100 });
             if (!success) {
                 console.log(errors);
-                progress.report({ increment: 100 });
                 showErrorMessage(`Synchronization of ${extension?.code} has finished with errors:\n` + errors);
+            } else {
+                showInformationMessage(`Synchronization of ${extension?.code} successful!`);
             }
-            progress.report({ increment: 100 });
-            showInformationMessage(`Synchronization of ${extension?.code} successful!`);
         });
     } catch (error) {
         showErrorMessage(error);
@@ -171,7 +171,7 @@ async function tryScanObject(
             if (extendsObject) {
                 for (let counter = 2; counter < fileLineByQuotationMark.length; counter++) {
                     tempString += fileLineByQuotationMark[counter];
-                    if (fileLineByQuotationMark.length -1 !== 2) {
+                    if (fileLineByQuotationMark.length - 1 !== 2) {
                         tempString += '"';
                     }
                 }
