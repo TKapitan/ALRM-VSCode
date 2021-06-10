@@ -12,6 +12,21 @@
 
 ## [Released Versions]
 
+### v0.4.3
+
+- Date of release: 10/06/2021
+
+Fixes
+
+- Wrong API URL if no tenant is specified (See [Issue #20](https://github.com/TKapitan/ALRM-VSCode/issues/20)).
+- When Synchronize command fails, both success and failure messages are shown (See [Issue #18](https://github.com/TKapitan/ALRM-VSCode/issues/18)).
+
+Other changes
+
+- Added support for multi-company BC environments (new setting "Company Id" that is used to build proper API URL) (See [Issue #11](https://github.com/TKapitan/ALRM-VSCode/issues/11)).
+- ALRM: Synchronize command is no longer beta version.
+- Examples of both on-premises and cloud API URLs were added to the README.
+
 ### v0.4.2
 
 - Date of release: 11/05/2021
