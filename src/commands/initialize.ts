@@ -22,6 +22,10 @@ export default async function initiliazeCommand(): Promise<void> {
             const assignableRanges = await service.getAllAssignableRanges();
             // XXX then edit app.json ranges
 
+            if(assignableRanges.length === 0){
+                throw new Error('No Assignable Ranges found. Please define at least one assignable range in the Business Central.');
+            }
+
             const assignableRangesPickItems: QuickPickItem[] = [];
             assignableRanges.forEach(assignableRange => {
                 let description = assignableRange.description;
