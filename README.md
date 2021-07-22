@@ -133,7 +133,6 @@ To use this extension, the API must provide:
         - Return Value
           - Nothing
   - assignableRanges
-    - Is used only when the "Assignable Ranges" is set to "API".
     - The API endpoint must process GET
       - Without filters
       - Response must contain
@@ -177,11 +176,6 @@ To use this extension, the API must provide:
   - Specifies username for autentification in the API
 - **al-id-range-manager.password**: API Password
   - Specifies password for autentification in the API
-- **al-id-range-manager.assignableRange**: Assignable Ranges
-  - Specifies how the assignable ranges should be used.
-  - Values
-    - API: Using this value, the assignable range will be mandatory.
-    - Do Not Use: Using this value, the assignable range will be skipped.
 
 ### Deprecated Settings (still available)
 

@@ -13,7 +13,6 @@ export default class Settings {
     private _apiUsername?: string;
     private _apiPassword?: string;
     private _authenticationType?: string;
-    private _useAssignableRange?: boolean;
     private _integrationApi?: IIntegrationApi;
     private static _instance: Settings;
 
@@ -22,7 +21,6 @@ export default class Settings {
     public get apiUsername(): string { return this._apiUsername || ''; }
     public get apiPassword(): string { return this._apiPassword || ''; }
     public get authenticationType(): string { return this._authenticationType || ''; }
-    public get useAssignableRange(): boolean { return this._useAssignableRange || false; }
     public get integrationApi(): IIntegrationApi { return this._integrationApi || IntegrationApiv1n0.instance; }
 
     private constructor() {
@@ -65,10 +63,6 @@ export default class Settings {
         this._apiUsername = config.get('username');
         this._apiPassword = config.get('password');
         this._authenticationType = config.get('authenticationType');
-        this._useAssignableRange = false;
-        if (config.get('assignableRange') === 'API') {
-            this._useAssignableRange = true;
-        }
     }
 
     public validate(): boolean {

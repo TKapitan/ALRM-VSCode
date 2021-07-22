@@ -72,15 +72,6 @@
           "type": "string",
           "default": "",
           "description": "API password"
-        },
-        "al-id-range-manager.assignableRange": {
-          "type": "string",
-          "enum": [
-            "API",
-            "Do Not Use"
-          ],
-          "default": "API",
-          "description": "Assignable Ranges"
         }
       }
     },

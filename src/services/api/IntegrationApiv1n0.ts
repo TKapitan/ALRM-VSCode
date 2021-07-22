@@ -1,5 +1,4 @@
 import AssignableRange from "../../models/assignableRange";
-import assignableRange from "../../models/assignableRange";
 import Extension from "../../models/extension";
 import BcClient, { Resources } from "../bcClient";
 import { IIntegrationApi } from "./IIntegrationApi";
@@ -86,7 +85,7 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
         }
         return objectLineId;
     }
-    async getAllAssignableRanges(): Promise<assignableRange[]> {
+    async getAllAssignableRanges(): Promise<AssignableRange[]> {
         const assignableRanges = await this.bcClient().readAll(Resources.assignableRange);
         return assignableRanges.map(e => AssignableRange.fromJson(e));
     }
