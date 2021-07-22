@@ -2,7 +2,6 @@
 
 ## [Unreleased]
 
-- Extend code for better usage for own backend part.
 - Allow to change which Snippets will be used to create a new object.
 - Add support for other possible types of authentification
 - Add support for deleting fields and objects for Synchronize command
@@ -11,6 +10,21 @@
 - More validation directly in VS on field/object ranges
 
 ## [Released Versions]
+
+### v0.4.4
+
+- Date of release: 23/07/2021
+
+Fixes
+
+- Reflect change of "Report Extension" snippet - the object name variable was renamed by Microsoft (See [Issue #26](https://github.com/TKapitan/ALRM-VSCode/issues/26)).
+- Add an error message to extension initialization when no assignable range exists (See [Issue #24](https://github.com/TKapitan/ALRM-VSCode/issues/24)).
+- Snippet variable replacement function is case-insensitive to avoid problems with changes in snippet format  (See [Issue #15](https://github.com/TKapitan/ALRM-VSCode/issues/15)).
+
+Other changes
+
+- New warning message when some of older API versions is used (checking during VS Code extension initialization).
+- Remove setting 'Assignable Range = Do Not Use/API', the API is the only supported way now & in the future.
 
 ### v0.4.3
 
