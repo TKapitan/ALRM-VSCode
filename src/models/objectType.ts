@@ -1,3 +1,5 @@
+import { replaceCaseInsensitive } from "../helpers/string";
+
 /* eslint-disable @typescript-eslint/naming-convention */
 export enum ObjectType {
     DotNet = -2,
@@ -176,74 +178,41 @@ export function substituteObjectInfo(
     objectName: string,
     objectId: string,
 ): string {
-    // TODO the replace should be case-insensitive
     switch (objectType) {
         case ObjectType.Codeunit:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyCodeunit}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyCodeunit}', `"${objectName}"`);
         case ObjectType.Page:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyPage}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyPage}', `"${objectName}"`);
         case ObjectType.PageExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyExtension}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyExtension}', `"${objectName}"`);
         case ObjectType.PageCustomization:
-            return snippetHeader
-                .replace('${1:MyCustomization}', `"${objectName}"`);
+            return replaceCaseInsensitive(snippetHeader, '${1:MyCustomization}', `"${objectName}"`);
         case ObjectType.Query:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyQuery}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyQuery}', `"${objectName}"`);
         case ObjectType.Report:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyReport}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyReport}', `"${objectName}"`);
         case ObjectType.ReportExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyExtension}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyExtension}', `"${objectName}"`);
         case ObjectType.Table:
-            return snippetHeader
-                .replace('${1:id}', objectId)
-                .replace('${2:MyTable}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyTable}', `"${objectName}"`);
         case ObjectType.TableExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyExtension}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyExtension}', `"${objectName}"`);
         case ObjectType.XMLPort:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyXmlport}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyXmlport}', `"${objectName}"`);
         case ObjectType.Enum:
-            return snippetHeader
-                .replace('${1:id}', objectId)
-                .replace('${2:MyEnum}', `"${objectName}"`);
-        // XXX default enum extension snippet contains value snippet
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyEnum}', `"${objectName}"`);
         case ObjectType.EnumExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyEnumExtension}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyEnumExtension}', `"${objectName}"`);
         case ObjectType.PermissionSet:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyPermissionSet}', `"${objectName}"`);
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyPermissionSet}', `"${objectName}"`);
         case ObjectType.PermissionSetExtension:
-            return snippetHeader
-                .replace('${1:Id}', objectId)
-                .replace('${2:MyPermissionSetExt}', `"${objectName}"`);
-        // TODO There are two snippets for profile in the file
+            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyPermissionSetExt}', `"${objectName}"`);
         case ObjectType.Profile:
-            return snippetHeader
-                .replace('${1:MyProfile}', `"${objectName}"`);
+            return replaceCaseInsensitive(snippetHeader, '${1:MyProfile}', `"${objectName}"`);
         case ObjectType.Interface:
-            return snippetHeader
-                .replace('${1:MyInterface}', `"${objectName}"`);
+            return replaceCaseInsensitive(snippetHeader, '${1:MyInterface}', `"${objectName}"`);
         case ObjectType.ControlAddin:
-            return snippetHeader
-                .replace('${1:MyControlAddIn}', `"${objectName}"`);
+            return replaceCaseInsensitive(snippetHeader, '${1:MyControlAddIn}', `"${objectName}"`);
     }
     throw new Error('Unknown object type: ' + objectType.toString());
 }
