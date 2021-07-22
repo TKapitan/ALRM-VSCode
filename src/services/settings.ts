@@ -43,6 +43,10 @@ export default class Settings {
                 this._integrationApi = IntegrationApiv1n0.instance;
                 break;
         }
+        if(this._integrationApi.isDeprecated()){
+            showWarningMessage('You are using deprecated API version ' + selectedApiVersion + '. Please update your BC backend app & setting in the VS Code.');
+        }
+
         this._apiBaseUrl = config.get('baseUrlWithoutVersion');
         if (this._apiBaseUrl !== '') {
             if(!this._apiBaseUrl?.endsWith('/')){

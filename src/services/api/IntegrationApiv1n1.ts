@@ -35,4 +35,8 @@ export default class IntegrationApiv1n1 extends IntegrationApiv1n0 implements II
         }
         return objectId;
     }
+
+    public isDeprecated(): boolean {
+        return false;
+    }
 }

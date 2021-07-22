@@ -12,4 +12,6 @@ export interface IIntegrationApi {
     createBcExtensionObject(createBCExtensionObjectRequest: CreateBCExtensionObjectRequest): Promise<number>;
     createBcExtensionObjectLine(createBCExtensionObjectLineRequest: CreateBCExtensionObjectLineRequest): Promise<number>
     getAllAssignableRanges(): Promise<AssignableRange[]>;
+
+    isDeprecated(): boolean;
 }

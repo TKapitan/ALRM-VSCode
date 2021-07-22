@@ -89,4 +89,8 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
         const assignableRanges = await this.bcClient().readAll(Resources.assignableRange);
         return assignableRanges.map(e => AssignableRange.fromJson(e));
     }
+
+    public isDeprecated(): boolean {
+        return true;
+    }
 }
