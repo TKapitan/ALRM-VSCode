@@ -204,7 +204,7 @@ export function substituteObjectInfo(
         case ObjectType.ReportExtension:
             return snippetHeader
                 .replace('${1:Id}', objectId)
-                .replace('${2:MyReport}', `"${objectName}"`);
+                .replace('${2:MyExtension}', `"${objectName}"`);
         case ObjectType.Table:
             return snippetHeader
                 .replace('${1:id}', objectId)
