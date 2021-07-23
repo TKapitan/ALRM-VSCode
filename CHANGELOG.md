@@ -11,15 +11,17 @@
 
 ## [Released Versions]
 
-### v0.4.4
+### v0.4.5
 
 - Date of release: 23/07/2021
+- Version v0.4.4 has not been released as a new bug ([Issue #22](https://github.com/TKapitan/ALRM-VSCode/issues/22)) has been found.
 
 Fixes
 
 - Reflect change of "Report Extension" snippet - the object name variable was renamed by Microsoft (See [Issue #26](https://github.com/TKapitan/ALRM-VSCode/issues/26)).
 - Add an error message to extension initialization when no assignable range exists (See [Issue #24](https://github.com/TKapitan/ALRM-VSCode/issues/24)).
-- Snippet variable replacement function is case-insensitive to avoid problems with changes in snippet format  (See [Issue #15](https://github.com/TKapitan/ALRM-VSCode/issues/15)).
+- Snippet variable replacement function is case-insensitive to avoid problems with changes in snippet format (See [Issue #15](https://github.com/TKapitan/ALRM-VSCode/issues/15)).
+- Trim white spaces from object type, name and id during ALRM: Synchronize (See [Issue #22](https://github.com/TKapitan/ALRM-VSCode/issues/22)).
 
 Other changes
 
