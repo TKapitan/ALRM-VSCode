@@ -88,7 +88,7 @@ export function extendsAnotherObject(objectType: ObjectType): boolean {
 
 // Translates object from string value to ObjectType object
 export function translateObjectType(fromString: string): ObjectType {
-    switch (fromString.toLowerCase()) {
+    switch (fromString.toLowerCase().trim()) {
         case 'codeunit':
             return ObjectType.Codeunit;
         case 'page':
@@ -178,6 +178,8 @@ export function substituteObjectInfo(
     objectName: string,
     objectId: string,
 ): string {
+    objectId = objectId.trim();
+    objectName = objectName.trim();
     switch (objectType) {
         case ObjectType.Codeunit:
             return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyCodeunit}', `"${objectName}"`);
