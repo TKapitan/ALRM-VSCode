@@ -88,38 +88,75 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
     return ObjectType[selectedObjectType?.label as keyof typeof ObjectType];
 }
 
+async function promptObjectSnippetSelection(snippetObject: Object): Promise<Object> {
+    let firstPrefix = '';
+    const items: QuickPickItem[] = [];
+    Object.keys(snippetObject).forEach(key => {
+        let description = '';
+        let prefix = '';
+        const value = snippetObject[key as keyof typeof snippetObject];
+        if ('description' in value) {
+            description = value['description'];
+        }
+        if ('prefix' in value) {
+            if (firstPrefix === '') {
+                firstPrefix = value['prefix'];
+            }
+            prefix = value['prefix'];
+        }
+        if (prefix === '' || firstPrefix === prefix) {
+            items.push({
+                'label': key,
+                'description': prefix,
+                'detail': description,
+            });
+        }
+    });
+
+    if (items.length === 1) {
+        return snippetObject[Object.keys(snippetObject)[0] as keyof typeof snippetObject];
+    }
+    const selectedObjectSnippet = await getUserSelection(items);
+    if (selectedObjectSnippet?.label === undefined) {
+        return snippetObject[Object.keys(snippetObject)[0] as keyof typeof snippetObject];
+    }
+    return snippetObject[selectedObjectSnippet?.label as keyof typeof snippetObject];
+}
+
 async function createObjectFile(
     snippetFileContent: Buffer,
     objectType: ObjectType,
     objectName: string,
     objectId: number,
 ) {
+    const snippet = await buildObjectSnippet(snippetFileContent, objectType, objectName, objectId);
+
     const textDocument = await vscode.workspace.openTextDocument({
         language: 'al',
     });
-
-    const snippet = buildObjectSnippet(snippetFileContent, objectType, objectName, objectId);
-
     const textEditor = await vscode.window.showTextDocument(textDocument);
-    textEditor.insertSnippet(snippet);
+    textEditor.insertSnippet(await snippet);
 }
 
-function buildObjectSnippet(
+async function buildObjectSnippet(
     snippetFileContent: Buffer,
     objectType: ObjectType,
     objectName: string,
     objectId: number,
-): vscode.SnippetString {
+): Promise<vscode.SnippetString> {
     let snippetObject = JSON.parse(snippetFileContent.toString());
     if (typeof snippetObject !== 'object') {
         throw new Error('Incorrect snippet file format!');
     }
 
-    if (Object.keys(snippetObject).length === 0) {
+    const numberOfSnippets = Object.keys(snippetObject).length;
+    if (numberOfSnippets === 0) {
         throw new Error('Incorrect snippet file format!');
+    } else if (numberOfSnippets > 1) {
+        snippetObject = await promptObjectSnippetSelection(snippetObject);
+    } else {
+        snippetObject = snippetObject[Object.keys(snippetObject)[0]];
     }
-
-    snippetObject = snippetObject[Object.keys(snippetObject)[0]];
     if (!('body' in snippetObject) || !Array.isArray(snippetObject['body'])) {
         throw new Error('Incorrect snippet file format!');
     }
