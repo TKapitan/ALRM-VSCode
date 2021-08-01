@@ -30,7 +30,7 @@ export async function getUserInput(prompt?: string): Promise<string | undefined>
 }
 
 export async function getUserSelection(items: QuickPickItem[]): Promise<QuickPickItem | undefined> {
-    return await vscode.window.showQuickPick(items);
+    return await vscode.window.showQuickPick(items, { ignoreFocusOut: true });
 }
 
 export async function promptInitialization(): Promise<void> {
