@@ -2,9 +2,8 @@ import { join } from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import App from '../models/app';
-import { ObjectType, objectTypeSnippetFileName } from '../models/objectType';
-
-const ALLANGUAGE = 'ms-dynamics-smb.al';
+import { ObjectType } from '../models/objectType';
+import Settings from './settings';
 
 export function readAppJson(workspaceFolderUri?: vscode.Uri): App {
     if (!workspaceFolderUri) {
@@ -42,14 +41,14 @@ export function readSnippetFile(objectType: ObjectType): Buffer {
     if (!userProfilePath) {
         throw new Error('User profile inaccessible!');
     }
-
+    
     const files = fs.readdirSync(join(userProfilePath, '.vscode', 'extensions'));
-    const snippetFileName = objectTypeSnippetFileName(objectType);
-    const alLanguageExtDirs = files.filter(e => e.startsWith(ALLANGUAGE));
+    const alLanguageExtDirs = files.filter(e => e.startsWith(Settings.instance.snippets.getSnippetFolder(objectType)));
 
+    const snippetFileName = Settings.instance.snippets.getSnippetFileName(objectType);
+    const snippetSubFolder = Settings.instance.snippets.getSnippetSubFolder(objectType);
     for (const i in alLanguageExtDirs) {
-        const snippetFilePath = join(userProfilePath, '.vscode', 'extensions', alLanguageExtDirs[i], 'snippets', snippetFileName);
-
+        const snippetFilePath = join(userProfilePath, '.vscode', 'extensions', alLanguageExtDirs[i], 'snippets', snippetSubFolder, snippetFileName);
         if (fs.existsSync(snippetFilePath)) {
             return fs.readFileSync(snippetFilePath);
         }

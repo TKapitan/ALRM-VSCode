@@ -72,6 +72,15 @@
           "type": "string",
           "default": "",
           "description": "API password"
+        },
+        "al-id-range-manager.snippets": {
+          "type": "string",
+          "enum": [
+            "Default",
+            "Waldo's CRS AL Language Snippets"
+          ],
+          "default": "Default",
+          "description": "Snippets"
         }
       }
     },

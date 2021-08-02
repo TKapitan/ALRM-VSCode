@@ -1,5 +1,3 @@
-import { replaceCaseInsensitive } from "../helpers/string";
-
 /* eslint-disable @typescript-eslint/naming-convention */
 export enum ObjectType {
     DotNet = -2,
@@ -129,48 +127,6 @@ export function translateObjectType(fromString: string): ObjectType {
     return ObjectType.UnKnownObjectType;
 }
 
-// Specify snippets for object types
-export function objectTypeSnippetFileName(objectType: ObjectType): string {
-    switch (objectType) {
-        case ObjectType.Table:
-            return 'table.json';
-        case ObjectType.TableExtension:
-            return 'tableextension.json';
-        case ObjectType.Page:
-            return 'page.json';
-        case ObjectType.PageExtension:
-            return 'pageextension.json';
-        case ObjectType.PageCustomization:
-            return 'pagecustomization.json';
-        case ObjectType.Codeunit:
-            return 'codeunit.json';
-        case ObjectType.Report:
-            return 'report.json';
-        case ObjectType.ReportExtension:
-            return 'reportextension.json';
-        case ObjectType.XMLPort:
-            return 'xmlport.json';
-        case ObjectType.Query:
-            return 'query.json';
-        case ObjectType.Enum:
-            return 'enum.json';
-        case ObjectType.EnumExtension:
-            return 'enumextension.json';
-        case ObjectType.PermissionSet:
-            return 'permissionset.json';
-        case ObjectType.PermissionSetExtension:
-            return 'permissionsetextension.json';
-        case ObjectType.Profile:
-            return 'profile.json';
-        case ObjectType.Interface:
-            return 'interface.json';
-        case ObjectType.ControlAddin:
-            return 'controladdin.json';
-        default:
-            throw new Error(`Unimplemented type ${objectType}!`);
-    }
-}
-
 // Substitute auto-generated information in AL snippets with provided names/ids
 export function substituteObjectInfo(
     snippetHeader: string,
@@ -182,39 +138,43 @@ export function substituteObjectInfo(
     objectName = objectName.trim();
     switch (objectType) {
         case ObjectType.Codeunit:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyCodeunit}', `"${objectName}"`);
         case ObjectType.Page:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyPage}', `"${objectName}"`);
         case ObjectType.PageExtension:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyExtension}', `"${objectName}"`);
-        case ObjectType.PageCustomization:
-            return replaceCaseInsensitive(snippetHeader, '${1:MyCustomization}', `"${objectName}"`);
         case ObjectType.Query:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyQuery}', `"${objectName}"`);
         case ObjectType.Report:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyReport}', `"${objectName}"`);
         case ObjectType.ReportExtension:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyExtension}', `"${objectName}"`);
         case ObjectType.Table:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyTable}', `"${objectName}"`);
         case ObjectType.TableExtension:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyExtension}', `"${objectName}"`);
         case ObjectType.XMLPort:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyXmlport}', `"${objectName}"`);
         case ObjectType.Enum:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyEnum}', `"${objectName}"`);
         case ObjectType.EnumExtension:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyEnumExtension}', `"${objectName}"`);
         case ObjectType.PermissionSet:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyPermissionSet}', `"${objectName}"`);
         case ObjectType.PermissionSetExtension:
-            return replaceCaseInsensitive(replaceCaseInsensitive(snippetHeader, '${1:Id}', objectId), '${2:MyPermissionSetExt}', `"${objectName}"`);
+            return replaceSnippetVariable(replaceSnippetVariable(snippetHeader, 1, objectId), 2, `"${objectName}"`);
+        case ObjectType.PageCustomization:
         case ObjectType.Profile:
-            return replaceCaseInsensitive(snippetHeader, '${1:MyProfile}', `"${objectName}"`);
         case ObjectType.Interface:
-            return replaceCaseInsensitive(snippetHeader, '${1:MyInterface}', `"${objectName}"`);
         case ObjectType.ControlAddin:
-            return replaceCaseInsensitive(snippetHeader, '${1:MyControlAddIn}', `"${objectName}"`);
+        case ObjectType.Entitlement:
+            return replaceSnippetVariable(snippetHeader, 1, `"${objectName}"`);
+        case ObjectType.DotNet:
+            return snippetHeader;
     }
     throw new Error('Unknown object type: ' + objectType.toString());
+}
+
+export function replaceSnippetVariable(where: string, variableNumber: number, by: string): string {
+    let variableEndPosition, endCharacter;
+    let variableStartPosition = where.toLowerCase().indexOf('"${' + variableNumber.toString() + ':');
+    if (variableStartPosition !== -1) {
+        endCharacter = '}"';
+        variableEndPosition = where.toLowerCase().indexOf(endCharacter, variableStartPosition);
+    } else {
+        endCharacter = '}';
+        variableStartPosition = where.toLowerCase().indexOf('${' + variableNumber.toString() + ':');
+        variableEndPosition = where.toLowerCase().indexOf(endCharacter, variableStartPosition);
+    }
+
+    const strTemp = where.substring(0, variableStartPosition);
+    return strTemp.concat(by, where.substring(variableEndPosition + endCharacter.length));
 }

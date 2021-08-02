@@ -5,6 +5,7 @@ import ExtensionService from '../services/extensionService';
 import { getCurrentWorkspaceUri, readAppJson, readSnippetFile } from '../services/fileService';
 import { QuickPickItem } from 'vscode';
 import CreateBCExtensionObjectRequest from '../services/api/requests/createBcExtensionObjectRequest';
+import Settings from '../services/settings';
 
 export default async function newObjectCommand(): Promise<void> {
     try {
@@ -88,7 +89,7 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
     return ObjectType[selectedObjectType?.label as keyof typeof ObjectType];
 }
 
-async function promptObjectSnippetSelection(snippetObject: Object): Promise<Object> {
+async function promptObjectSnippetSelection(objectType: ObjectType, snippetObject: Object): Promise<Object> {
     let firstPrefix = '';
     const items: QuickPickItem[] = [];
     Object.keys(snippetObject).forEach(key => {
@@ -104,7 +105,7 @@ async function promptObjectSnippetSelection(snippetObject: Object): Promise<Obje
             }
             prefix = value['prefix'];
         }
-        if (prefix === '' || firstPrefix === prefix) {
+        if (prefix === '' || Settings.instance.snippets.showALObjectSnippet(objectType, firstPrefix, prefix)) {
             items.push({
                 'label': key,
                 'description': prefix,
@@ -153,7 +154,7 @@ async function buildObjectSnippet(
     if (numberOfSnippets === 0) {
         throw new Error('Incorrect snippet file format!');
     } else if (numberOfSnippets > 1) {
-        snippetObject = await promptObjectSnippetSelection(snippetObject);
+        snippetObject = await promptObjectSnippetSelection(objectType, snippetObject);
     } else {
         snippetObject = snippetObject[Object.keys(snippetObject)[0]];
     }
