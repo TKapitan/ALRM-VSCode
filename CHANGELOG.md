@@ -2,7 +2,6 @@
 
 ## [Unreleased]
 
-- Allow to change which Snippets will be used to create a new object.
 - Add support for other possible types of authentification
 - Add support for deleting fields and objects for Synchronize command
 - Improving Synchronize command to be quicker (do directory scanning and object scanning asynchronously)
@@ -10,6 +9,21 @@
 - More validation directly in VS on field/object ranges
 
 ## [Released Versions]
+
+### v0.5.0
+
+- Date of release: 14/08/2021
+
+Major changes
+
+- Users can choose which snippets to use. Till now, the standard snippets were only available. With this update, standard snippets are default snippets but users can choose snippets made by Eric 'Waldo' Wauters, <https://www.waldo.be/> instead (must be installed in the VS Code environment).
+- Add support for multiple snippets for the same object type (for example page extension has more than one snippet - for card, list, ... page types). If more snippets are found, users are asked to choose which snippet wants to use.
+
+Other changes
+
+- Set IgnoreFocusOut for New Object command. With this setting the command will not be canceled when changing focus outside of the VS Code.
+- New Object command was refactored to fix focus loosing if the whole process took longer than expected.
+- BaseURL setting (deprecated since 2021/Q1, marked to be removed in 2021/Q3) was removed.
 
 ### v0.4.5
 

@@ -176,6 +176,11 @@ To use this extension, the API must provide:
   - Specifies username for autentification in the API
 - **al-id-range-manager.password**: API Password
   - Specifies password for autentification in the API
+- **al-id-range-manager.snippets**: Snippets
+  - Specifies which snippets are used for the "New Object" command.
+  - Available options
+    - Default (standard Microsoft's snippets)
+    - Waldo's CRS AL Language Snippets
 
 ### Deprecated Settings (still available)
 
