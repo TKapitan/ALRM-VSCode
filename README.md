@@ -152,7 +152,7 @@ To use this extension, the API must provide:
 
 ## Extension Settings
 
-- **al-id-range-manager.baseUrl**: DEPRECATED: Base Url Without Version  
+- **al-id-range-manager.baseUrlWithoutVersion**: Base Url Without Version  
   - Specifies URL of the APIs without specific API version and/or company
   - Format (for usage with Microsoft Dynamics 365 Business Central On-Premises)
     - `https://{server}:{port}/{instance}/api/teamARTAAAE/extension/`
@@ -179,11 +179,7 @@ To use this extension, the API must provide:
 
 ### Deprecated Settings (still available)
 
-- **al-id-range-manager.baseUrl**: DEPRECATED: Base URL  
-  - DEPRECATED SINCE 0.4.1, will be removed 2021/Q3.
-  - Specifies URL of the APIs
-  - Format (for usage with Microsoft Dynamics 365 Business Central)
-    - `https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/`
+Nothing
 
 ## Known Issues
 

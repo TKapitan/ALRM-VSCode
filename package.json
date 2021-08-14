@@ -26,11 +26,6 @@
     "configuration": {
       "title": "ALRM: AL ID Range Manager",
       "properties": {
-        "al-id-range-manager.baseUrl": {
-          "type": "string",
-          "default": "",
-          "description": "!!!DEPRECATED!!! API Base URL (for the Business Central API: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/v1.0/)"
-        },
         "al-id-range-manager.baseUrlWithoutVersion": {
           "type": "string",
           "default": "",

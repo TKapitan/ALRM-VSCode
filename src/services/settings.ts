@@ -48,7 +48,7 @@ export default class Settings {
                 this._integrationApi = IntegrationApiv1n0.instance;
                 break;
         }
-        if(this._integrationApi.isDeprecated()){
+        if (this._integrationApi.isDeprecated()) {
             showWarningMessage('You are using deprecated API version ' + selectedApiVersion + '. Please update your BC backend app & setting in the VS Code.');
         }
 
@@ -62,20 +62,13 @@ export default class Settings {
                 break;
         }
         this._apiBaseUrl = config.get('baseUrlWithoutVersion');
-        if (this._apiBaseUrl !== '') {
-            if(!this._apiBaseUrl?.endsWith('/')){
-                this._apiBaseUrl += '/';
-            }
-            this._apiBaseUrl += this._integrationApi.getApiVersionURLFormatted() + '/';
-            const companyId = config.get('companyId');
-            if (companyId !== '') {
-                this._apiBaseUrl += 'companies(' + companyId + ')/';
-            }
-        } else {
-            this._apiBaseUrl = config.get('baseUrl');
-            if (this._apiBaseUrl !== '') {
-                showWarningMessage('API Base URL is deprecated. Please update settings - set API Base URL without version field and clear API Base URL field!');
-            }
+        if (!this._apiBaseUrl?.endsWith('/')) {
+            this._apiBaseUrl += '/';
+        }
+        this._apiBaseUrl += this._integrationApi.getApiVersionURLFormatted() + '/';
+        const companyId = config.get('companyId');
+        if (companyId !== '') {
+            this._apiBaseUrl += 'companies(' + companyId + ')/';
         }
         this._apiTenant = config.get('tenant');
         this._apiUsername = config.get('username');
