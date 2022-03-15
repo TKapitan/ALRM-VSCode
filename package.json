@@ -16,6 +16,7 @@
     "onCommand:al-id-range-manager.synchronize",
     "onCommand:al-id-range-manager.newObject",
     "onCommand:al-id-range-manager.newObjectLine",
+    "onCommand:al-id-range-manager.switchObjectIDs",
     "onLanguage:al"
   ],
   "main": "./out/extension.js",
@@ -95,7 +96,11 @@
       {
         "command": "al-id-range-manager.newObjectLine",
         "title": "ALRM: New object extension field or value"
-      }
+      },
+      {
+        "command": "al-id-range-manager.switchObjectIDs",
+        "title": "ALRM: Switch object IDs"
+      }      
     ]
   },
   "scripts": {

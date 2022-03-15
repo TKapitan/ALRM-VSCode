@@ -9,6 +9,8 @@ import CreateBCExtensionRequest from "./api/requests/createBcExtensionRequest";
 import CreateBCExtensionObjectRequest from "./api/requests/createBcExtensionObjectRequest";
 import CreateBCExtensionObjectLineRequest from "./api/requests/createBcExtensionObjectLineRequest";
 import AssignableRange from "../models/assignableRange";
+import ExtensionObject from "../models/extensionObject";
+import ExtensionObjectLine from "../models/extensionObjectLine";
 
 export default class ExtensionService {
     private static cache: Record<string, Extension> = {};
@@ -30,6 +32,14 @@ export default class ExtensionService {
         }
         ExtensionService.cache[workspace.fsPath] = extension;
         return extension;
+    }
+
+    public async getExtensionObject(extensionID: string, objectType: string, objectID: number): Promise<ExtensionObject | null> {
+        return await this.iIntegrationApi.getBcExtensionObject(extensionID, objectType, objectID);
+    }
+
+    public async getExtensionObjectLine(extensionID: string, objectType: string, objectID: number, fieldID: number): Promise<ExtensionObjectLine | null> {
+        return await this.iIntegrationApi.getBcExtensionObjectLine(extensionID, objectType, objectID, fieldID);
     }
 
     public async createExtension(workspace: vscode.Uri, app: App, rangeCode?: string): Promise<Extension> {
