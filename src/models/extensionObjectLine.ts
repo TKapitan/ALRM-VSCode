@@ -7,7 +7,7 @@ export default class ExtensionObjectLine {
         this.alternateFieldID = alternateFieldID;
     }
 
-    public static fromJson(json: Object): ExtensionObjectLine {
+    public static fromJson(json: any): ExtensionObjectLine {
         return new ExtensionObjectLine(
             'fieldID' in json ? json['fieldID'] : 0,
             'alternateFieldID' in json ? json['alternateFieldID'] : 0,

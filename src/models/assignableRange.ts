@@ -13,7 +13,7 @@ export default class AssignableRange {
         this.isDefault = isDefault;
     }
 
-    public static fromJson(json: Object): AssignableRange {
+    public static fromJson(json: any): AssignableRange {
         return new AssignableRange(
             'code' in json ? json['code'] : '',
             'description' in json ? json['description'] : '',

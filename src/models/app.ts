@@ -22,7 +22,7 @@ export default class App {
         this.application = application;
     }
 
-    public static fromJson(json: Object): App {
+    public static fromJson(json: any): App {
         return new App(
             'id' in json ? json['id'] : '',
             'name' in json ? json['name'] : '',

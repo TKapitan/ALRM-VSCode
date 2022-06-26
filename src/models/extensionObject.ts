@@ -11,7 +11,7 @@ export default class ExtensionObject {
         this.alternateObjectID = alternateObjectID;
     }
 
-    public static fromJson(json: Object): ExtensionObject {
+    public static fromJson(json: any): ExtensionObject {
         return new ExtensionObject(
             'rangeCode' in json ? json['rangeCode'] : '',
             'alternateRangeCode' in json ? json['alternateRangeCode'] : '',

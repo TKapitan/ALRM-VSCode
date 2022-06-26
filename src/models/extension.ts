@@ -9,7 +9,7 @@ export default class Extension {
         this.alternateRangeCode = alternateRangeCode;
     }
 
-    public static fromJson(json: Object): Extension {
+    public static fromJson(json: any): Extension {
         return new Extension(
             'code' in json ? json['code'] : '',
             'id' in json ? json['id'] : '',
