@@ -9,8 +9,8 @@ export default class ExtensionObjectLine {
 
     public static fromJson(json: any): ExtensionObjectLine {
         return new ExtensionObjectLine(
-            'fieldID' in json ? json['fieldID'] : 0,
-            'alternateFieldID' in json ? json['alternateFieldID'] : 0,
+            'id' in json ? json['id'] : 0,
+            'alternateID' in json ? json['alternateID'] : 0,
         );
     }
 }

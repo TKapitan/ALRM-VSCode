@@ -37,14 +37,14 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
         return Extension.fromJson(extensions[0]);
     }
     async getBcExtensionObject(extensionID: string, objectType: string, objectID: number): Promise<ExtensionObject | null> {
-        const extensionObjects = await this.bcClient().readMultiple(Resources.extension, {
+        let extensionObjects = await this.bcClient().readMultiple(Resources.extensionObject, {
             top: 1,
-            filter: `extensionID eq ${extensionID} and objectType eq ${objectType} and objectID eq ${objectID}`
+            filter: `extensionID eq ${extensionID} and objectType eq '${objectType}' and objectID eq ${objectID}`
         });
         if (extensionObjects.length === 0) {
-            const extensionObjects = await this.bcClient().readMultiple(Resources.extension, {
+            extensionObjects = await this.bcClient().readMultiple(Resources.extensionObject, {
                 top: 1,
-                filter: `extensionID eq ${extensionID} and objectType eq ${objectType} and alternateObjectID eq ${objectID}`
+                filter: `extensionID eq ${extensionID} and objectType eq '${objectType}' and alternateObjectID eq ${objectID}`
             });
             if (extensionObjects.length === 0) {
                 return null;
@@ -53,16 +53,16 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
         return ExtensionObject.fromJson(extensionObjects[0]);
     }
     async getBcExtensionObjectLine(extensionID: string, objectType: string, objectID: number, fieldID: number): Promise<ExtensionObjectLine | null> {
-        const extensionObjectLines = await this.bcClient().readMultiple(Resources.extensionObject, {
+        let extensionObjectLines = await this.bcClient().readMultiple(Resources.extensionObjectLine, {
             top: 1,
-            filter: `extensionID eq ${extensionID} and objectType eq ${objectType} and objectID eq ${objectID} and fieldID eq ${fieldID}`
+            filter: `extensionID eq ${extensionID} and objectType eq '${objectType}' and objectID eq ${objectID} and id eq ${fieldID}`
         });
         if (extensionObjectLines.length === 0) {
-            const extensionObjects = await this.bcClient().readMultiple(Resources.extension, {
+            extensionObjectLines = await this.bcClient().readMultiple(Resources.extensionObjectLine, {
                 top: 1,
-                filter: `extensionID eq ${extensionID} and objectType eq ${objectType} and alternateObjectID eq ${objectID} and alternateFieldID eq ${fieldID}`
+                filter: `extensionID eq ${extensionID} and objectType eq '${objectType}' and alternateObjectID eq ${objectID} and alternateID eq ${fieldID}`
             });
-            if (extensionObjects.length === 0) {
+            if (extensionObjectLines.length === 0) {
                 return null;
             }
         }

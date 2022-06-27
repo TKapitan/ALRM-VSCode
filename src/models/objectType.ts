@@ -84,6 +84,47 @@ export function extendsAnotherObject(objectType: ObjectType): boolean {
     return extensionObjectTypes.findIndex(x => x === objectType) !== -1;
 }
 
+// Translates object from ObjectType object to string value
+export function translateObjectTypeFromObjectType(fromObjectType: ObjectType): string {
+    switch(fromObjectType) {
+        case ObjectType.Codeunit:
+            return 'Codeunit';
+        case ObjectType.Entitlement:
+            return 'Entitlement';
+        case ObjectType.Enum:
+            return 'Enum';
+        case ObjectType.EnumExtension:
+            return 'Enum Extension';
+        case ObjectType.Interface:
+            return 'Interface';
+        case ObjectType.Page:
+            return 'Page';
+        case ObjectType.PageCustomization:
+            return 'Page Customization';
+        case ObjectType.PageExtension:
+            return 'Page Extension';
+        case ObjectType.PermissionSet:
+            return 'Permission Set';
+        case ObjectType.PermissionSetExtension:
+            return 'Permission Set Extension';
+        case ObjectType.Profile:
+            return 'Profile';
+        case ObjectType.Query:
+            return 'Query';
+        case ObjectType.Report:
+            return 'Report';
+        case ObjectType.ReportExtension:
+            return 'Report Extension';
+        case ObjectType.Table:
+            return 'Table';
+        case ObjectType.TableExtension:
+            return 'Table Extension';
+        case ObjectType.XMLPort:
+            return 'XML Port';
+    }
+    return 'UNKNOWN';
+}
+
 // Translates object from string value to ObjectType object
 export function translateObjectType(fromString: string): ObjectType {
     switch (fromString.toLowerCase().trim()) {

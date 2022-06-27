@@ -1,7 +1,7 @@
 import { getCurrentWorkspaceUri } from "../services/fileService";
 import ExtensionService from "../services/extensionService";
 import { showErrorMessage, promptInitialization, showInformationMessage } from "../helpers/userInteraction";
-import { extendsAnotherObject, hasObjectTypeIDs, ObjectType, shouldBeObjectTypeIgnored, translateObjectType } from "../models/objectType";
+import { extendsAnotherObject, hasObjectTypeIDs, ObjectType, shouldBeObjectTypeIgnored, translateObjectType, translateObjectTypeFromObjectType } from "../models/objectType";
 import Extension from "../models/extension";
 import * as vscode from 'vscode';
 import * as fs from "fs";
@@ -41,11 +41,20 @@ export async function synchronize(switchIDs = false): Promise<void> {
         }, async (progress) => {
             const [success, errors] = await scanDirectory(workspaceFolderPath, switchIDs);
             progress.report({ increment: 100 });
-            if (!success) {
-                console.log(errors);
-                showErrorMessage(`Synchronization of ${extension?.code} has finished with errors:\n` + errors);
+            if (switchIDs) {
+                if (!success) {
+                    console.log(errors);
+                    showErrorMessage(`Some of object/field IDs of ${extension?.code} weren't switched due to following problems:\n` + errors);
+                } else {
+                    showInformationMessage(`All object & field IDs of ${extension?.code} were switched successfully!`);
+                }
             } else {
-                showInformationMessage(`Synchronization of ${extension?.code} successful!`);
+                if (!success) {
+                    console.log(errors);
+                    showErrorMessage(`Synchronization of ${extension?.code} has finished with errors:\n` + errors);
+                } else {
+                    showInformationMessage(`Synchronization of ${extension?.code} successful!`);
+                }
             }
         });
     } catch (error) {
@@ -59,6 +68,7 @@ async function scanDirectory(workspaceFolderPath: string, switchIDs: boolean): P
     let errorStrings = '';
     const fs = require("fs");
     const files = fs.readdirSync(workspaceFolderPath);
+    const replaceInFile = require('replace-in-file');
 
     console.log('Scanning directory: ' + workspaceFolderPath);
     let scannedItemWithFullPath: string;
@@ -117,6 +127,21 @@ async function scanDirectory(workspaceFolderPath: string, switchIDs: boolean): P
                                             scanForObjectValues = true;
                                             break;
                                     }
+
+                                    // Object found
+                                    if (!scanForObject && switchIDs && newObjectID !== 0 && oldObjectID !== 0) {
+                                        try {
+                                            const replaceOptions = {
+                                                files: scannedItemWithFullPath,
+                                                from: [objectType + ' ' + oldObjectID + ' '],
+                                                to: [objectType + ' ' + newObjectID + ' '],
+                                            };
+                                            replaceInFile(replaceOptions);
+                                        } catch (error) {
+                                            throw new Error('ID ' + oldObjectID + ' in file ' + scannedItemWithFullPath + ' can not be replaced by ' + newObjectID + '.');
+                                        }
+                                    }
+
                                     if (!scanForObjectFields && !scanForObjectValues) {
                                         break;
                                     }
@@ -125,39 +150,32 @@ async function scanDirectory(workspaceFolderPath: string, switchIDs: boolean): P
                         } else if (scanForObjectFields) {
                             // Scan for fields of table extension
                             [inFieldsSection, inFieldOrValueSection, noOfOpenBrackets, oldFieldID, newFieldID] = await scanObjectFields(fileLine, objectType, oldObjectID, inFieldsSection, inFieldOrValueSection, noOfOpenBrackets, switchIDs);
+                            if (switchIDs && oldFieldID !== 0 && newFieldID !== 0) {
+                                try {
+                                    const replaceOptions = {
+                                        files: scannedItemWithFullPath,
+                                        from: ['field(' + oldFieldID + ';'],
+                                        to: ['field(' + newFieldID + ';'],
+                                    };
+                                    replaceInFile(replaceOptions);
+                                } catch (error) {
+                                    throw new Error('Field ID ' + oldFieldID + ' in file ' + scannedItemWithFullPath + ' can not be replaced by ' + newFieldID + '.');
+                                }
+                            }
                         } else if (scanForObjectValues) {
                             // Scan for values of enum extension
                             [inFieldOrValueSection, noOfOpenBrackets, oldFieldID, newFieldID] = await scanObjectValues(fileLine, objectType, oldObjectID, inFieldOrValueSection, noOfOpenBrackets, switchIDs);
-                        }
-
-                        if (switchIDs) {
-                            const replaceInFile = require('replace-in-file');
-                            let replaceOptions = {
-                                files: scannedItemWithFullPath,
-                                from: [oldObjectID + ' '],
-                                to: [newObjectID + ' '],
-                            };
-                            try {
-                                let identifier = '';
-                                if (scanForObjectFields) {
-                                    identifier = 'field';
-                                } else if (scanForObjectValues) {
-                                    identifier = 'value';
-                                }
-
-                                
-                                replaceOptions = {
-                                    files: scannedItemWithFullPath,
-                                    from: [identifier + '(' + oldFieldID + ' '],
-                                    to: [identifier + '(' + newFieldID + ' '],
-                                };
+                            if (switchIDs && oldFieldID !== 0 && newFieldID !== 0) {
                                 try {
+                                    const replaceOptions = {
+                                        files: scannedItemWithFullPath,
+                                        from: ['value(' + oldFieldID + ';'],
+                                        to: ['value(' + newFieldID + ';'],
+                                    };
                                     replaceInFile(replaceOptions);
                                 } catch (error) {
-                                    throw new Error('ID ' + oldObjectID + ' in file ' + scannedItemWithFullPath + ' can not be replaced by ' + newObjectID + '.');
+                                    throw new Error('Value ID ' + oldFieldID + ' in file ' + scannedItemWithFullPath + ' can not be replaced by ' + newFieldID + '.');
                                 }
-                            } catch (error) {
-                                throw new Error('ID ' + oldObjectID + ' in file ' + scannedItemWithFullPath + ' can not be replaced by ' + newObjectID + '.');
                             }
                         }
 
@@ -263,7 +281,7 @@ async function tryScanObject(
             if (createBCExtensionObjectRequest.objectID !== 0) {
                 const extensionObject = await service.getExtensionObject(
                     extension.id,
-                    translateObjectType(objectTypeString).toString(),
+                    translateObjectTypeFromObjectType(translateObjectType(objectTypeString)),
                     +objectID
                 );
 
@@ -321,7 +339,7 @@ async function scanObjectFields(
                     }
                     const extensionObjectLine = await service.getExtensionObjectLine(
                         extension.id,
-                        translateObjectType(objectType).toString(),
+                        translateObjectTypeFromObjectType(translateObjectType(objectType)),
                         +objectID,
                         +fieldID
                     );
@@ -386,7 +404,7 @@ async function scanObjectValues(
                 }
                 const extensionObjectLine = await service.getExtensionObjectLine(
                     extension.id,
-                    translateObjectType(objectType).toString(),
+                    translateObjectTypeFromObjectType(translateObjectType(objectType)),
                     +objectID,
                     +valueID
                 );
