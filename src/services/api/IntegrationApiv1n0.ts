@@ -1,5 +1,7 @@
 import AssignableRange from "../../models/assignableRange";
 import Extension from "../../models/extension";
+import ExtensionObject from "../../models/extensionObject";
+import ExtensionObjectLine from "../../models/extensionObjectLine";
 import BcClient, { Resources } from "../bcClient";
 import { IIntegrationApi } from "./IIntegrationApi";
 import CreateBCExtensionObjectLineRequest from "./requests/createBcExtensionObjectLineRequest";
@@ -34,6 +36,40 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
         }
         return Extension.fromJson(extensions[0]);
     }
+    async getBcExtensionObject(extensionID: string, objectType: string, objectID: number): Promise<ExtensionObject | null> {
+        let extensionObjects = await this.bcClient().readMultiple(Resources.extensionObject, {
+            top: 1,
+            filter: `extensionID eq ${extensionID} and objectType eq '${objectType}' and objectID eq ${objectID}`
+        });
+        if (extensionObjects.length === 0) {
+            extensionObjects = await this.bcClient().readMultiple(Resources.extensionObject, {
+                top: 1,
+                filter: `extensionID eq ${extensionID} and objectType eq '${objectType}' and alternateObjectID eq ${objectID}`
+            });
+            if (extensionObjects.length === 0) {
+                return null;
+            }
+        }
+        return ExtensionObject.fromJson(extensionObjects[0]);
+    }
+    async getBcExtensionObjectLine(extensionID: string, objectType: string, objectID: number, fieldID: number): Promise<ExtensionObjectLine | null> {
+        let extensionObjectLines = await this.bcClient().readMultiple(Resources.extensionObjectLine, {
+            top: 1,
+            filter: `extensionID eq ${extensionID} and objectType eq '${objectType}' and objectID eq ${objectID} and id eq ${fieldID}`
+        });
+        if (extensionObjectLines.length === 0) {
+            extensionObjectLines = await this.bcClient().readMultiple(Resources.extensionObjectLine, {
+                top: 1,
+                filter: `extensionID eq ${extensionID} and objectType eq '${objectType}' and alternateObjectID eq ${objectID} and alternateID eq ${fieldID}`
+            });
+            if (extensionObjectLines.length === 0) {
+                return null;
+            }
+        }
+        return ExtensionObjectLine.fromJson(extensionObjectLines[0]);
+    }
+
+
     async createBcExtension(createBCExtensionRequest: CreateBCExtensionRequest): Promise<Extension> {
         const extension = await this.bcClient().create(Resources.extension, {
             id: createBCExtensionRequest.id,

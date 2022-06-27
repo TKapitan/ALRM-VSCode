@@ -30,27 +30,7 @@ export default class SnippetsWaldo implements ISnippets {
         if (this._unsupportedObjectTypes.findIndex(x => x === objectType) !== -1) {
             return SnippetsDefault.instance.getSnippetSubFolder(objectType);
         }
-        switch (objectType) {
-            case ObjectType.Codeunit:
-            case ObjectType.ControlAddin:
-            case ObjectType.DotNet:
-            case ObjectType.Enum:
-            case ObjectType.EnumExtension:
-            case ObjectType.Interface:
-            case ObjectType.Page:
-            case ObjectType.Profile:
-            case ObjectType.Query:
-            case ObjectType.Report:
-            case ObjectType.Table:
-            case ObjectType.XMLPort:
-                return 'fromAlExtension';
-            case ObjectType.PageExtension:
-            case ObjectType.PageCustomization:
-            case ObjectType.TableExtension:
-                return '';
-            default:
-                throw new Error(`Unimplemented type ${objectType}!`);
-        }
+        return 'fromAlExtension';
     }
 
     getSnippetFileName(objectType: ObjectType): string {
@@ -58,36 +38,44 @@ export default class SnippetsWaldo implements ISnippets {
             return SnippetsDefault.instance.getSnippetFileName(objectType);
         }
         switch (objectType) {
-            case ObjectType.Table:
-                return 'table.json';
-            case ObjectType.TableExtension:
-                return 'tableextension.json';
-            case ObjectType.Page:
-                return 'page.json';
-            case ObjectType.PageExtension:
-                return 'pageextension.json';
-            case ObjectType.PageCustomization:
-                return 'pagecustomization.json';
             case ObjectType.Codeunit:
                 return 'codeunit.json';
-            case ObjectType.Report:
-                return 'report.json';
-            case ObjectType.XMLPort:
-                return 'xmlport.json';
-            case ObjectType.Query:
-                return 'query.json';
-            case ObjectType.Enum:
-                return 'enum.json';
-            case ObjectType.EnumExtension:
-                return 'enumextension.json';
-            case ObjectType.Profile:
-                return 'profile.json';
-            case ObjectType.Interface:
-                return 'interface.json';
             case ObjectType.ControlAddin:
                 return 'controladdin.json';
             case ObjectType.DotNet:
                 return 'dotnet.json';
+            case ObjectType.Entitlement:
+                return 'entitlement.json';
+            case ObjectType.Enum:
+                return 'enum.json';
+            case ObjectType.EnumExtension:
+                return 'enumextension.json';
+            case ObjectType.Interface:
+                return 'interface.json';
+            case ObjectType.Page:
+                return 'page.json';
+            case ObjectType.PageCustomization:
+                return 'pagecustomization.json';
+            case ObjectType.PageExtension:
+                return 'pageextension.json';
+            case ObjectType.PermissionSet:
+                return 'permissionset.json';
+            case ObjectType.PermissionSetExtension:
+                return 'permissionsetextension.json';
+            case ObjectType.Profile:
+                return 'profile.json';
+            case ObjectType.Query:
+                return 'query.json';
+            case ObjectType.Report:
+                return 'report.json';
+            case ObjectType.ReportExtension:
+                return 'reportextension.json';
+            case ObjectType.Table:
+                return 'table.json';
+            case ObjectType.TableExtension:
+                return 'tableextension.json';
+            case ObjectType.XMLPort:
+                return 'xmlport.json';
             default:
                 throw new Error(`Unimplemented type ${objectType}!`);
         }
