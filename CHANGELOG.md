@@ -10,6 +10,30 @@
 
 ## [Released Versions]
 
+### v0.6.2
+
+- Date of release: 03/12/2022
+
+Fixes
+
+- Only the oldest object types are shown when Runtime = 10.0 ([Issue #31](https://github.com/TKapitan/ALRM-VSCode/issues/31))
+
+### v0.6.1
+
+- Date of release: 27/06/2022
+
+Major changes
+- Beta version of 'Switch IDs' command to be able to change ID ranges for all objects (for example PTE-ONPREM range vs. CLOUD-ONLY range)
+
+Fixes
+
+- Fix links to some snippets in Waldo's extension
+- Node.JS version update
+
+### v0.6.0
+
+Internal release, major bug fixed in 6.1
+
 ### v0.5.0
 
 - Date of release: 14/08/2021
