@@ -2,7 +2,7 @@ export default class App {
     id: string;
     name: string;
     description: string;
-    runtime: string;
+    runtime: number;
     platform: string;
     application: string;
 
@@ -10,7 +10,7 @@ export default class App {
         id: string,
         name: string,
         description: string,
-        runtime: string,
+        runtime: number,
         platform: string,
         application: string,
     ) {
