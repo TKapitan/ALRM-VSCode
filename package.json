@@ -3,7 +3,7 @@
   "displayName": "AL ID Range Manager",
   "description": "Manage your object ids in Microsoft Business Central.",
   "publisher": "ARTAAAEfromCzechiaKeptycz",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "icon": "resources/img/ALIDRangeManager.png",
   "engines": {
     "vscode": "^1.51.0"
@@ -127,6 +127,7 @@
   },
   "dependencies": {
     "axios": "^0.21.4",
-    "replace-in-file": "^6.3.5"
+    "replace-in-file": "^6.3.5",
+    "yarn": "^1.22.19"
   }
 }

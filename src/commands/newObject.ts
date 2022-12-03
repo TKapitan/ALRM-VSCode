@@ -63,16 +63,16 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
     const workspaceUri = getCurrentWorkspaceUri();
     const app = readAppJson(workspaceUri);
     let objectTypesArray = originalObjects;
-    if (app.runtime >= '4.0') {
+    if (app.runtime >= 4.0) {
         objectTypesArray = objectTypesArray.concat(runtime04Objects);
     }
-    if (app.runtime >= '5.0') {
+    if (app.runtime >= 5.0) {
         objectTypesArray = objectTypesArray.concat(runtime05Objects);
     }
-    if (app.runtime >= '6.0') {
+    if (app.runtime >= 6.0) {
         objectTypesArray = objectTypesArray.concat(runtime06Objects);
     }
-    if (app.runtime >= '7.0') {
+    if (app.runtime >= 7.0) {
         objectTypesArray = objectTypesArray.concat(runtime07Objects);
     }
 

@@ -30,6 +30,12 @@ Since v0.3.1 the command filter object types based on runtime version specified 
 
 Creates an extension object line record in connected Business Central instance. Only usable in table extensions and enum extensions. Creates a new field or enum value at current cursor position with id provided by BC.
 
+### ALRM: Switch object IDs (BETA)
+
+Allows to automatically switch IDs for all objects and table/enum extensions. The extension must have alternate assignable range assigned in ALRM for Business Central. Using this command, you can freely switch ID ranges between two different ranges (for example one for ONPREM range and another for CLOUDONLY range).
+
+Available since v0.6.1 and works with ALRM Business Central extension version 0.1.7.0 
+
 ## Requirements
 
 To use this VS Code extension, you must set API connection to the backend system that store, validate & manage all extension objects & fields details.
@@ -37,118 +43,6 @@ To use this VS Code extension, you must set API connection to the backend system
 We prepared Microsoft Dynamics 365 Business Central Extension that  met all requirements and is designed to work together with this VS Code extension. The source codes could be found on GitHub: <https://github.com/TKapitan/ALRM-BusinessCentral>
 
 However, this VS Code extension could be used with your own backend side, created in the Business Central or using any other programming language.
-
-To use this extension, the API must provide:
-
-- API endpoints (currently, only ODATA api format is supported)
-  - extensions
-    - The API endpoint must process POST create
-      - The create request contains data
-        - id
-          - Guid
-          - Guid of the extension, is used as a key. The value is automatically loaded from the app.json file.
-        - rangeCode
-          - String
-          - Code of the ranges that should be used to assign IDs.
-          - Is used only when the "Assignable Ranges" is set to "API".
-        - name
-          - String (250 characters)
-          - Name of the extension automatically loaded from app.json
-        - description
-          - String (250 characters)
-          - Description of the extension automatically loaded from app.json
-    - The API endpoint must process two actions (POST requests)
-      - Microsoft.NAV.createObject
-        - Accept three parameters (newly created object identification without the ID) and return ID of the object as a number.
-        - Parameters
-          - objectType
-            - String
-            - Specifies type of the newly created object.
-            - In the format of Business Central objects (for example: Table/TableExtension/...).
-          - objectName
-            - String
-            - Specifies name of the newly created object.
-          - extendsObjectName (since v1.1)
-            - String
-            - Specifies name of object that is extended by newly created extension object. The field must be filled in for extension objects only.
-          - createBy
-            - String (50 characters)
-            - Specifies user identification who did the request.
-        - Return Value
-          - Number
-          - ID of the newly created object, will be automatically inserted to the created object.
-      - Microsoft.NAV.createObjectFieldOrValue (replacing Microsoft.NAV.createObjectLine from v0.3.1)
-        - Accept three parameters (object identification in which the field should be created and user who did the request) and return ID of the field as a number.
-        - Parameters
-          - objectType
-            - String
-            - Specifies type of the object in which we want to create a field.
-            - In the format of Business Central objects (for example: Table/TableExtension/...).
-          - objectID
-            - String
-            - Specifies ID of the object in which we want to create a field.
-          - createBy
-            - String (50 characters)
-            - Specifies user identification who did the request.
-        - Return Value
-          - Number
-          - ID of the newly created field, will be automatically inserted to the created field.
-      - Microsoft.NAV.createObjectWithOwnID
-        - Accept four parameters (newly created object identification with ID). No return value.
-        - Parameters
-          - objectType
-            - String
-            - Specifies type of the newly created object.
-            - In the format of Business Central objects (for example: Table/TableExtension/...).
-          - objectID
-            - String
-            - Specifies ID of the object which we want to register
-          - objectName
-            - String
-            - Specifies name of the newly created object.
-          - extendsObjectName (since v1.1)
-            - String
-            - Specifies name of object that is extended by newly created extension object. The field must be filled in for extension objects only.
-          - createBy
-            - String (50 characters)
-            - Specifies user identification who did the request.
-        - Return Value
-          - Nothing
-      - Microsoft.NAV.createObjectFieldOrValueWithOwnID (new in v0.3.1)
-        - Accept four parameters (object identification in which the field should be created, new field/value ID and user who did the request). No return value.
-        - Parameters
-          - objectType
-            - String
-            - Specifies type of the object in which we want to create a field.
-            - In the format of Business Central objects (for example: Table/TableExtension/...).
-          - objectID
-            - String
-            - Specifies ID of the object in which we want to create a field.
-          - fieldOrValueID
-            - String
-            - Specifies ID of the field or value we want to register
-          - createBy
-            - String (50 characters)
-            - Specifies user identification who did the request.
-        - Return Value
-          - Nothing
-  - assignableRanges
-    - The API endpoint must process GET
-      - Without filters
-      - Response must contain
-        - code
-          - String
-          - Identification of assignable ranges that could be used for creating a new extension.
-          - The value is later used as a parameter "rangeCode" in the "extensions" API endpoint for POST create method.
-      - Response can also contain some other useful information. These fields are not necessary. All these fields are used for description when new extension is initialized and user is asked to choose the assignable range. Default assignable range is shown first (as default).
-        - description
-          - String
-        - defaultObjectRangeFrom
-          - Number
-        - defaultObjectRangeTo
-          - Number
-        - default
-          - String
 
 ## Extension Settings
 
