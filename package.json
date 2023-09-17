@@ -27,10 +27,26 @@
     "configuration": {
       "title": "ALRM: AL ID Range Manager",
       "properties": {
+        "al-id-range-manager.apiType": {
+          "title": "API Type",
+          "type": "string",
+          "enum": [
+            "OnPrem",
+            "Cloud"
+          ],
+          "markdownEnumDescriptions": [
+            "Requires **Base Url**, **Username** and **Password**",
+            ""
+          ],
+          "default": "Cloud",
+          "order": 0
+        },
         "al-id-range-manager.baseUrlWithoutVersion": {
           "type": "string",
+          "title": "Base Url",
           "default": "",
-          "description": "API Base URL without version (for example: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/)"
+          "markdownDescription": "Specifies the API Base URL without version (for example: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/). Mandatory for **OnPrem** API.",
+          "order": 1
         },
         "al-id-range-manager.apiVersion": {
           "type": "string",
@@ -38,45 +54,59 @@
             "1.0",
             "1.1"
           ],
-          "default": "1.0",
-          "description": "API Version"
+          "default": "1.1",
+          "description": "Specifies the API version. Select the highest available version installed on your server.",
+          "order": 2
         },
         "al-id-range-manager.tenant": {
+          "title": "Tenant",
           "type": "string",
-          "default": "default",
-          "description": "API Tenant (Specifies tenant on which the API is hosted.)"
+          "default": "common",
+          "description": "Specifies tenant on which the API is hosted.",
+          "order": 3
         },
         "al-id-range-manager.companyId": {
+          "title": "Company Id",
           "type": "string",
           "default": "",
-          "description": "API Company Id (Specifies the ID of the company for API URL. If connecting to the instance's default company, the field can be blank.)"
+          "description": "Specifies the ID of the company for API URL. If connecting to the instance's default company, the field can be blank.",
+          "order": 4
         },
         "al-id-range-manager.authenticationType": {
+          "title": "Authentication type",
           "type": "string",
           "enum": [
-            "Basic"
+            "Basic",
+            "Oauth"
           ],
           "default": "Basic",
-          "description": "API Authentication Type"
+          "markdownDescription": "Specifies the API authentication type. **Cloud** API supports **Oauth** only.",
+          "order": 5
         },
         "al-id-range-manager.username": {
+          "title": "Username",
           "type": "string",
           "default": "",
-          "description": "API username"
+          "markdownDescription": "Specifies the username used for API calls when using **OnPrem** API with **Basic** authentication. Mandatory for **OnPrem** API.",
+          "order": 6
         },
         "al-id-range-manager.password": {
+          "title": "Password",
           "type": "string",
           "default": "",
-          "description": "API password"
+          "markdownDescription": "Specifies the password used for API calls when using **OnPrem** API with **Basic** authentication. Mandatory for **OnPrem** API.",
+          "order": 7
         },
         "al-id-range-manager.snippets": {
+          "title": "Snippets",
           "type": "string",
           "enum": [
             "Default",
             "Waldo's CRS AL Language Snippets"
           ],
           "default": "Default",
-          "description": "Snippets"
+          "description": "Snippets",
+          "order": 8
         }
       }
     },
@@ -100,6 +130,10 @@
       {
         "command": "al-id-range-manager.switchObjectIDs",
         "title": "ALRM: Switch object IDs"
+      },
+      {
+        "command": "al-id-range-manager.test",
+        "title": "ALRM: Test oauth"
       }
     ]
   },

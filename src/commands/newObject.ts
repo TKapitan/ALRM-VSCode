@@ -15,7 +15,6 @@ import {
   runtime07Objects,
   substituteObjectInfo
 } from "../models/objectType";
-import CreateBCExtensionObjectRequest from "../services/api/requests/createBcExtensionObjectRequest";
 import ExtensionService from "../services/extensionService";
 import {
   getCurrentWorkspaceUri,
@@ -55,16 +54,13 @@ export default async function newObjectCommand(): Promise<void> {
       showErrorMessage("Maximal lenght of AL Object name has to be 30 chars.");
     }
 
-    const createBCExtensionObjectRequest = new CreateBCExtensionObjectRequest(
+    const newObjectId = await service.createExtensionObject({
       extension,
-      objectType.toString(),
-      0,
+      objectType: objectType.toString(),
+      objectID: 0,
       objectName,
-      "",
-    );
-    const newObjectId = await service.createExtensionObject(
-      createBCExtensionObjectRequest,
-    );
+      extendsObjectName: "",
+    });
     if (newObjectId === null) {
       showErrorMessage("New object could not be created!");
       return;
@@ -98,7 +94,7 @@ async function promptObjectSelection(): Promise<ObjectType | undefined> {
     objectTypesArray = objectTypesArray.concat(runtime07Objects);
   }
 
-  const items: QuickPickItem[] = [];
+  const items: vscode.QuickPickItem[] = [];
   for (const objectTypeID of objectTypesArray) {
     items.push({
       label: ObjectType[objectTypeID],
@@ -116,19 +112,19 @@ async function promptObjectSnippetSelection(
   snippetObject: Object,
 ): Promise<Object> {
   let firstPrefix = "";
-  const items: QuickPickItem[] = [];
+  const items: vscode.QuickPickItem[] = [];
   Object.keys(snippetObject).forEach((key) => {
     let description = "";
     let prefix = "";
     const value = snippetObject[key as keyof typeof snippetObject];
     if ("description" in value) {
-      description = value["description"];
+      description = value["description"] as string; // FIXME
     }
     if ("prefix" in value) {
       if (firstPrefix === "") {
-        firstPrefix = value["prefix"];
+        firstPrefix = value["prefix"] as string; // FIXME
       }
-      prefix = value["prefix"];
+      prefix = value["prefix"] as string; // FIXME
     }
     if (
       prefix === "" ||

@@ -6,6 +6,7 @@ import NewObjectLineCommand from "./commands/newObjectLine";
 import SwitchObjectIDsCommand from "./commands/switchObjectIDs";
 import SynchronizeCommand from "./commands/synchronize";
 import { promptMissingSettings } from "./helpers/userInteraction";
+import { getAccessToken } from "./services/oauthClient";
 import Settings from "./services/settings";
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -13,6 +14,9 @@ export function activate(context: vscode.ExtensionContext): void {
   if (!settings.validate()) {
     promptMissingSettings();
   }
+
+  const secretStorage = context.secrets;
+
   const disposables = [
     vscode.commands.registerCommand(
       "al-id-range-manager.initialize",
@@ -34,6 +38,9 @@ export function activate(context: vscode.ExtensionContext): void {
       "al-id-range-manager.switchObjectIDs",
       SwitchObjectIDsCommand,
     ),
+    vscode.commands.registerCommand("al-id-range-manager.test", () => {
+      getAccessToken(secretStorage);
+    }),
   ];
 
   context.subscriptions.push(...disposables);

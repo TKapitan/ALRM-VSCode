@@ -1,6 +1,4 @@
-import axios, { AxiosResponse, Method } from "axios";
-
-import Settings, { AUTH_TYPE_BASIC } from "./settings";
+import { AxiosInstance, AxiosResponse, Method } from "axios";
 
 export class Resources {
   public static readonly extension = "extensions";
@@ -9,54 +7,47 @@ export class Resources {
   public static readonly assignableRange = "assignableRanges";
 }
 
+type UrlParameters = {
+  resource: string;
+  id?: string;
+  actionName?: string;
+  queryParameters?: QueryParameters;
+};
+
 interface QueryParameters {
   top?: number;
   skip?: number;
   filter?: string;
 }
 
+export type ClientBuilder = () => Promise<AxiosInstance> | AxiosInstance;
+
 export default class BcClient {
   private baseUrl: string;
-  private settings: Settings;
+  private clientBuilder: ClientBuilder;
 
-  constructor() {
-    this.settings = Settings.instance;
-    this.validateSettings(this.settings);
+  constructor(baseUrl: string, clientBuilder: ClientBuilder) {
+    // TODO this.validateSettings(this.settings);
+    this.clientBuilder = clientBuilder;
 
-    this.baseUrl = this.settings.apiBaseUrl ?? "";
-    switch (this.settings.authenticationType) {
-      case AUTH_TYPE_BASIC: {
-        const authorization: string = Buffer.from(
-          `${this.settings.apiUsername}:${this.settings.apiPassword}`,
-        ).toString("base64");
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Basic ${authorization}`;
-        break;
-      }
-      default: {
-        throw new Error(
-          "Unsupported authentification type: " +
-            this.settings.authenticationType,
-        );
-      }
-    }
-    axios.defaults.validateStatus = (status: number) =>
-      status >= 200 && status < 500;
+    this.baseUrl = baseUrl;
   }
 
-  private validateSettings(settings: Settings) {
-    if (!settings.validate()) {
-      throw new Error("Provide api url, name and password in settings!");
-    }
-  }
+  // TODO move elsewhere
+  // private validateSettings(settings: Settings) {
+  //   // TODO move elsewhere
+  //   if (!settings.validate()) {
+  //     throw new Error("Provide api url, name and password in settings!");
+  //   }
+  // }
 
-  public get username(): string {
-    return this.settings.apiUsername;
-  }
+  // // TODO move elsewhere
+  // public get username(): string {
+  //   return this.settings.apiUsername;
+  // }
 
   public async read(resource: string, id: string): Promise<Object> {
-    const response = await this.sendRequest("GET", this.buildUrl(resource, id));
+    const response = await this.sendRequest("GET", { resource, id });
 
     if (response.data === null || typeof response.data !== "object") {
       throw new Error(`Unexpected return type: ${typeof response.data}`);
@@ -68,10 +59,10 @@ export default class BcClient {
     resource: string,
     parameters?: QueryParameters,
   ): Promise<any[]> {
-    const response = await this.sendRequest(
-      "GET",
-      this.buildUrl(resource, undefined, undefined, parameters),
-    );
+    const response = await this.sendRequest("GET", {
+      resource,
+      queryParameters: parameters,
+    });
 
     if (response.data === null || typeof response.data !== "object") {
       throw new Error(`Unexpected return type: ${typeof response.data}`);
@@ -105,11 +96,7 @@ export default class BcClient {
   }
 
   public async create(resource: string, data: Object): Promise<Object> {
-    const response = await this.sendRequest(
-      "POST",
-      this.buildUrl(resource),
-      data,
-    );
+    const response = await this.sendRequest("POST", { resource }, data);
 
     if (response.data === null || typeof response.data !== "object") {
       throw new Error(`Unexpected return type: ${typeof response.data}`);
@@ -125,7 +112,7 @@ export default class BcClient {
   ): Promise<Object> {
     const response = await this.sendRequest(
       "POST",
-      this.buildUrl(resource, id, actionName),
+      { resource, id, actionName },
       data,
     );
 
@@ -144,15 +131,18 @@ export default class BcClient {
 
   private async sendRequest(
     method: Method,
-    url: string,
+    urlParameters: UrlParameters,
     data?: Object,
   ): Promise<AxiosResponse> {
+    const url = this.buildUrl(urlParameters);
+
+    const axios = await this.clientBuilder();
+
     const response = await axios.request({
       url: url,
       method: method,
       headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        "Content-Type": "application/json",
+        "content-type": "application/json",
       },
       data: data,
       validateStatus: (status: number) => status >= 200 && status < 500,
@@ -177,13 +167,12 @@ export default class BcClient {
     }
   }
 
-  private buildUrl(
-    resource: string,
-    id?: string,
-    actionName?: string,
-    queryParameters?: QueryParameters,
-  ): string {
-    let urlParamDelim = "?";
+  private buildUrl({
+    resource,
+    id,
+    actionName,
+    queryParameters,
+  }: UrlParameters): string {
     let url: string = this.baseUrl;
     if (!url.endsWith("/")) {
       url += "/";
@@ -197,27 +186,29 @@ export default class BcClient {
       url += `/Microsoft.NAV.${actionName}`;
     }
 
-    const tenant = this.settings.apiTenant;
+    const urlSearchParams = new URLSearchParams();
+
+    const tenant = this.settings.apiTenant; // TODO must be kept for backwards compatibility
     if (tenant !== "") {
-      url += urlParamDelim + "tenant=" + tenant;
-      urlParamDelim = "&";
+      urlSearchParams.append("tenant", tenant);
     }
+
     if (queryParameters !== undefined) {
-      const parameters: string[] = [];
       if (queryParameters.top !== undefined) {
-        parameters.push(`$top=${queryParameters.top}`);
+        urlSearchParams.append("$top", queryParameters.top.toString());
       }
       if (queryParameters.skip !== undefined) {
-        parameters.push(`$skip=${queryParameters.skip}`);
+        urlSearchParams.append("$skip", queryParameters.skip.toString());
       }
       if (queryParameters.filter !== undefined) {
-        parameters.push(`$filter=${queryParameters.filter}`);
-      }
-
-      if (parameters.length !== 0) {
-        url += urlParamDelim + parameters.join("&");
+        urlSearchParams.append("$filter", queryParameters.filter);
       }
     }
-    return url;
+
+    if (urlSearchParams.entries.length === 0) {
+      return url;
+    }
+
+    return `${url}?${urlSearchParams.toString()}`;
   }
 }

@@ -40,8 +40,8 @@ export async function getUserInput(
 }
 
 export async function getUserSelection(
-  items: QuickPickItem[],
-): Promise<QuickPickItem | undefined> {
+  items: vscode.QuickPickItem[],
+): Promise<vscode.QuickPickItem | undefined> {
   return await vscode.window.showQuickPick(items, { ignoreFocusOut: true });
 }
 
