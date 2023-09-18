@@ -12,10 +12,9 @@ import {
   IntegrationApiProvider
 } from "./api/IIntegrationApi";
 import { readAppJson } from "./fileService";
-import Settings from "./settings";
 
 export default class ExtensionService {
-  private static cache: Record<string, Extension> = {};
+  private static cache: Record<string, Extension> = {}; // TODO also clear this on settings change?
   private iIntegrationApi: IIntegrationApi;
 
   constructor() {

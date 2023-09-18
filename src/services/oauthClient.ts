@@ -12,6 +12,9 @@ const SCOPE = [
 export async function getAccessToken(
   secretStorage: SecretStorage,
 ): Promise<string> {
+  // TODO remove tokens when settings change
+  // => add the client id + tenant + scopes as a key for comparison?
+
   const { accessToken, expiresAt, refreshToken } =
     await getStoredTokens(secretStorage);
 

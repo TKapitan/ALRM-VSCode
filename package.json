@@ -38,7 +38,7 @@
             "Requires **Base Url**, **Username** and **Password**",
             ""
           ],
-          "default": "Cloud",
+          "default": "OnPrem",
           "order": 0
         },
         "al-id-range-manager.baseUrlWithoutVersion": {
@@ -62,15 +62,22 @@
           "title": "Tenant",
           "type": "string",
           "default": "common",
-          "description": "Specifies tenant on which the API is hosted.",
+          "description": "Specifies the tenant on which the API is hosted.",
           "order": 3
+        },
+        "al-id-range-manager.environment": {
+          "title": "Environment",
+          "type": "string",
+          "default": "",
+          "description": "Specifies the environment (instance) on which the API is hosted.",
+          "order": 4
         },
         "al-id-range-manager.companyId": {
           "title": "Company Id",
           "type": "string",
           "default": "",
           "description": "Specifies the ID of the company for API URL. If connecting to the instance's default company, the field can be blank.",
-          "order": 4
+          "order": 5
         },
         "al-id-range-manager.authenticationType": {
           "title": "Authentication type",
@@ -81,21 +88,21 @@
           ],
           "default": "Basic",
           "markdownDescription": "Specifies the API authentication type. **Cloud** API supports **Oauth** only.",
-          "order": 5
+          "order": 6
         },
         "al-id-range-manager.username": {
           "title": "Username",
           "type": "string",
           "default": "",
           "markdownDescription": "Specifies the username used for API calls when using **OnPrem** API with **Basic** authentication. Mandatory for **OnPrem** API.",
-          "order": 6
+          "order": 7
         },
         "al-id-range-manager.password": {
           "title": "Password",
           "type": "string",
           "default": "",
           "markdownDescription": "Specifies the password used for API calls when using **OnPrem** API with **Basic** authentication. Mandatory for **OnPrem** API.",
-          "order": 7
+          "order": 8
         },
         "al-id-range-manager.snippets": {
           "title": "Snippets",
@@ -106,7 +113,7 @@
           ],
           "default": "Default",
           "description": "Snippets",
-          "order": 8
+          "order": 9
         }
       }
     },

@@ -42,6 +42,9 @@ export default class BcClient {
   // }
 
   // // TODO move elsewhere
+  get username(): string {
+    return "FIXME"; // FIXME
+  }
   // public get username(): string {
   //   return this.settings.apiUsername;
   // }
@@ -188,7 +191,7 @@ export default class BcClient {
 
     const urlSearchParams = new URLSearchParams();
 
-    const tenant = this.settings.apiTenant; // TODO must be kept for backwards compatibility
+    const tenant = ""; // FIXME this.settings.apiTenant; // TODO must be kept for backwards compatibility
     if (tenant !== "") {
       urlSearchParams.append("tenant", tenant);
     }
@@ -203,10 +206,6 @@ export default class BcClient {
       if (queryParameters.filter !== undefined) {
         urlSearchParams.append("$filter", queryParameters.filter);
       }
-    }
-
-    if (urlSearchParams.entries.length === 0) {
-      return url;
     }
 
     return `${url}?${urlSearchParams.toString()}`;

@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-import * as vscode from "vscode";
 
 import AssignableRange from "../../models/assignableRange";
 import Extension from "../../models/extension";
@@ -50,6 +49,7 @@ export interface IIntegrationApi {
     objectID: number,
     fieldID: number,
   ): Promise<ExtensionObjectLine | null>;
+
   createBcExtension(
     createBCExtensionRequest: CreateBCExtensionRequest,
   ): Promise<Extension>;
@@ -73,8 +73,6 @@ export class IntegrationApiProvider {
     }
 
     const settings = SettingsProvider.getSettings();
-
-    // TODO using apiVersion from the settings, build appropriate api integration
     this.instance = IntegrationApiProvider.buildIntegrationApi(settings);
 
     return this.instance;

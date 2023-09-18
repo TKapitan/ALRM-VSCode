@@ -21,7 +21,7 @@ import {
   readAppJson,
   readSnippetFile
 } from "../services/fileService";
-import Settings from "../services/settings";
+import Settings, { SettingsProvider } from "../services/settings";
 
 export default async function newObjectCommand(): Promise<void> {
   try {
@@ -113,6 +113,8 @@ async function promptObjectSnippetSelection(
 ): Promise<Object> {
   let firstPrefix = "";
   const items: vscode.QuickPickItem[] = [];
+  const settings = SettingsProvider.getSettings();
+
   Object.keys(snippetObject).forEach((key) => {
     let description = "";
     let prefix = "";
@@ -128,11 +130,7 @@ async function promptObjectSnippetSelection(
     }
     if (
       prefix === "" ||
-      Settings.instance.snippets.showALObjectSnippet(
-        objectType,
-        firstPrefix,
-        prefix,
-      )
+      settings.snippets.showALObjectSnippet(objectType, firstPrefix, prefix)
     ) {
       items.push({
         label: key,
