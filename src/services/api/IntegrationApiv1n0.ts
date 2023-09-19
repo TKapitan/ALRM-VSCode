@@ -3,11 +3,12 @@ import Extension from "../../models/extension";
 import ExtensionObject from "../../models/extensionObject";
 import ExtensionObjectLine from "../../models/extensionObjectLine";
 import BcClient, { Resources } from "../bcClient";
+import { SettingsProvider } from "../settings";
 import {
   CreateBCExtensionObjectLineRequest,
   CreateBCExtensionObjectRequest,
   CreateBCExtensionRequest,
-  IIntegrationApi
+  IIntegrationApi,
 } from "./IIntegrationApi";
 
 export default class IntegrationApiv1n0 implements IIntegrationApi {
@@ -15,10 +16,6 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
 
   constructor(bcClient: BcClient) {
     this.bcClient = bcClient;
-  }
-
-  public getApiVersionURLFormatted(): string {
-    return "v1.0";
   }
 
   async getBcExtension(id: string): Promise<Extension | null> {
@@ -102,6 +99,8 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
   async createBcExtensionObject(
     createBCExtensionObjectRequest: CreateBCExtensionObjectRequest,
   ): Promise<number> {
+    const settings = SettingsProvider.getSettings();
+
     if (createBCExtensionObjectRequest.objectID !== 0) {
       await this.bcClient.callAction(
         Resources.extension,
@@ -111,7 +110,7 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
           objectType: createBCExtensionObjectRequest.objectType,
           objectID: createBCExtensionObjectRequest.objectID,
           objectName: createBCExtensionObjectRequest.objectName,
-          createdBy: this.bcClient.username?.substr(0, 50) ?? "",
+          createdBy: settings.apiUsername?.substring(0, 50) ?? "",
         },
       );
       return createBCExtensionObjectRequest.objectID;
@@ -123,7 +122,7 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
       {
         objectType: createBCExtensionObjectRequest.objectType,
         objectName: createBCExtensionObjectRequest.objectName,
-        createdBy: this.bcClient.username?.substr(0, 50) ?? "",
+        createdBy: settings.apiUsername?.substring(0, 50) ?? "",
       },
     );
     const objectId = Number(response);
@@ -136,6 +135,8 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
   async createBcExtensionObjectLine(
     createBCExtensionObjectLineRequest: CreateBCExtensionObjectLineRequest,
   ): Promise<number> {
+    const settings = SettingsProvider.getSettings();
+
     if (createBCExtensionObjectLineRequest.fieldOrValueID !== 0) {
       await this.bcClient.callAction(
         Resources.extension,
@@ -145,7 +146,7 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
           objectType: createBCExtensionObjectLineRequest.objectType,
           objectID: createBCExtensionObjectLineRequest.objectID,
           fieldOrValueID: createBCExtensionObjectLineRequest.fieldOrValueID,
-          createdBy: this.bcClient.username?.substring(0, 50) ?? "",
+          createdBy: settings.apiUsername?.substring(0, 50) ?? "",
         },
       );
       return createBCExtensionObjectLineRequest.fieldOrValueID;
@@ -158,7 +159,7 @@ export default class IntegrationApiv1n0 implements IIntegrationApi {
       {
         objectType: createBCExtensionObjectLineRequest.objectType,
         objectID: createBCExtensionObjectLineRequest.objectID,
-        createdBy: this.bcClient.username?.substring(0, 50) ?? "",
+        createdBy: settings.apiUsername?.substring(0, 50) ?? "",
       },
     );
     const objectLineId = Number(response);

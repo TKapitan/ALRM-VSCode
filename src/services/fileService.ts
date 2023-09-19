@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 
 import App from "../models/app";
 import { ObjectType } from "../models/objectType";
-import Settings, { SettingsProvider } from "./settings";
+import { SettingsProvider } from "./settings";
 
 export function readAppJson(workspaceFolderUri?: vscode.Uri): App {
   if (!workspaceFolderUri) {

@@ -1,13 +1,5 @@
-import axios, { AxiosInstance } from "axios";
-import { settings } from "cluster";
 import * as vscode from "vscode";
 
-import { showWarningMessage } from "../helpers/userInteraction";
-import { IIntegrationApi } from "./api/IIntegrationApi";
-import IntegrationApiv1n0 from "./api/IntegrationApiv1n0";
-import IntegrationApiv1n1 from "./api/IntegrationApiv1n1";
-import BcClient, { ClientBuilder } from "./bcClient";
-import { getAccessToken } from "./oauthClient";
 import { ISnippets } from "./snippets/ISnippets";
 import SnippetsDefault from "./snippets/SnippetsDefault";
 import SnippetsWaldo from "./snippets/SnippetsWaldo";
@@ -72,53 +64,6 @@ export default class Settings {
     this.snippets = snippets;
   }
 
-  // private parseConfig() {
-  //   const config = vscode.workspace.getConfiguration(CONFIG_KEY);
-
-  //   const selectedApiVersion = config.get("apiVersion");
-  //   switch (selectedApiVersion) {
-  //     case "1.1":
-  //       this._integrationApi = IntegrationApiv1n1.instance;
-  //       break;
-  //     default:
-  //       this._integrationApi = IntegrationApiv1n0.instance;
-  //       break;
-  //   }
-  //   if (this._integrationApi.isDeprecated()) {
-  //     showWarningMessage(
-  //       "You are using deprecated API version " +
-  //         selectedApiVersion +
-  //         ". Please update your BC backend app & setting in the VS Code.",
-  //     );
-  //   }
-
-  //   const selectedSnippets = config.get("snippets");
-  //   switch (selectedSnippets) {
-  //     case "Waldo's CRS AL Language Snippets":
-  //       this._snippets = SnippetsWaldo.instance;
-  //       break;
-  //     default:
-  //       this._snippets = SnippetsDefault.instance;
-  //       break;
-  //   }
-
-  //   this._apiBaseUrl = config.get("baseUrlWithoutVersion");
-  //   if (!this._apiBaseUrl?.endsWith("/")) {
-  //     this._apiBaseUrl += "/";
-  //   }
-  //   this._apiBaseUrl += this._integrationApi.getApiVersionURLFormatted() + "/";
-
-  //   const companyId = config.get("companyId");
-  //   if (companyId !== "") {
-  //     this._apiBaseUrl += "companies(" + companyId + ")/";
-  //   }
-
-  //   this._apiTenant = config.get("tenant");
-  //   this._apiUsername = config.get("username");
-  //   this._apiPassword = config.get("password");
-  //   this._authenticationType = config.get("authenticationType");
-  // }
-
   public validate(): boolean {
     if (
       this.apiBaseUrl === "" ||
@@ -131,14 +76,32 @@ export default class Settings {
   }
 }
 
-// TODO subscribe to vscode.workspace.onDidChangeConfiguration to invalidate settings instance
+type SettingsChangeListener = (settings: Settings) => void;
+type GetSettingsAndListenResult = {
+  settings: Settings;
+  removeListener: () => void;
+};
 
 export class SettingsProvider {
-  private static secretStorage: vscode.SecretStorage | undefined;
+  private static secretStorage: vscode.SecretStorage;
   private static settings?: Settings;
 
   static configure(secretStorage: vscode.SecretStorage): void {
     SettingsProvider.secretStorage = secretStorage;
+
+    this.settings = this.parseConfig(); // TODO this can fail
+  }
+
+  static getSettingsAndSubscribe(
+    listener: SettingsChangeListener,
+  ): GetSettingsAndListenResult {
+    this.onResetSubscriptions.push(listener);
+
+    return {
+      settings: SettingsProvider.getSettings(),
+      removeListener: () =>
+        this.onResetSubscriptions.filter((e) => e !== listener),
+    };
   }
 
   static getSettings(): Settings {
@@ -146,8 +109,23 @@ export class SettingsProvider {
       return this.settings;
     }
 
-    this.settings = this.parseConfig();
+    this.settings = this.parseConfig(); // TODO this can fail
     return this.settings;
+  }
+
+  static reset(): void {
+    this.settings = undefined;
+    this.settings = this.parseConfig(); // TODO this can fail
+
+    SettingsProvider.onReset(this.settings);
+  }
+
+  private static onResetSubscriptions: Array<SettingsChangeListener> = [];
+
+  static onReset(settings: Settings): void {
+    for (const listener of SettingsProvider.onResetSubscriptions) {
+      listener(settings);
+    }
   }
 
   static parseConfig(): Settings {
@@ -155,7 +133,7 @@ export class SettingsProvider {
 
     const apiType = config.get<string>("apiType");
     const version = config.get<string>("apiVersion");
-    const environment = config.get<string>("environment"); // TODO not defined in package.json
+    const environment = config.get<string>("environment");
 
     // FIXME should this be here?
     // if (integrationApi.isDeprecated()) {
@@ -207,5 +185,17 @@ export class SettingsProvider {
       secretStorage: SettingsProvider.secretStorage,
       snippets,
     });
+  }
+
+  static addConfigurationChangeListener(): vscode.Disposable {
+    return vscode.workspace.onDidChangeConfiguration(
+      (e: vscode.ConfigurationChangeEvent) => {
+        if (!e.affectsConfiguration(CONFIG_KEY)) {
+          return;
+        }
+
+        SettingsProvider.reset();
+      },
+    );
   }
 }

@@ -139,8 +139,8 @@
         "title": "ALRM: Switch object IDs"
       },
       {
-        "command": "al-id-range-manager.test",
-        "title": "ALRM: Test oauth"
+        "command": "al-id-range-manager.clearCredentials",
+        "title": "ALRM: Clear credentials (oauth)"
       }
     ]
   },

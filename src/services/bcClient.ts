@@ -24,13 +24,22 @@ export type ClientBuilder = () => Promise<AxiosInstance> | AxiosInstance;
 
 export default class BcClient {
   private baseUrl: string;
+  private tenant: string | undefined;
   private clientBuilder: ClientBuilder;
 
-  constructor(baseUrl: string, clientBuilder: ClientBuilder) {
+  constructor({
+    baseUrl,
+    tenant,
+    clientBuilder,
+  }: {
+    baseUrl: string;
+    tenant: string | undefined;
+    clientBuilder: ClientBuilder;
+  }) {
     // TODO this.validateSettings(this.settings);
-    this.clientBuilder = clientBuilder;
-
     this.baseUrl = baseUrl;
+    this.tenant = tenant;
+    this.clientBuilder = clientBuilder;
   }
 
   // TODO move elsewhere
@@ -39,14 +48,6 @@ export default class BcClient {
   //   if (!settings.validate()) {
   //     throw new Error("Provide api url, name and password in settings!");
   //   }
-  // }
-
-  // // TODO move elsewhere
-  get username(): string {
-    return "FIXME"; // FIXME
-  }
-  // public get username(): string {
-  //   return this.settings.apiUsername;
   // }
 
   public async read(resource: string, id: string): Promise<Object> {
@@ -191,12 +192,11 @@ export default class BcClient {
 
     const urlSearchParams = new URLSearchParams();
 
-    const tenant = ""; // FIXME this.settings.apiTenant; // TODO must be kept for backwards compatibility
-    if (tenant !== "") {
-      urlSearchParams.append("tenant", tenant);
+    if (this.tenant) {
+      urlSearchParams.append("tenant", this.tenant);
     }
 
-    if (queryParameters !== undefined) {
+    if (queryParameters) {
       if (queryParameters.top !== undefined) {
         urlSearchParams.append("$top", queryParameters.top.toString());
       }

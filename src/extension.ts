@@ -5,17 +5,21 @@ import NewObjectCommand from "./commands/newObject";
 import NewObjectLineCommand from "./commands/newObjectLine";
 import SwitchObjectIDsCommand from "./commands/switchObjectIDs";
 import SynchronizeCommand from "./commands/synchronize";
-import { promptMissingSettings } from "./helpers/userInteraction";
-import { getAccessToken } from "./services/oauthClient";
-import Settings from "./services/settings";
+import {
+  promptMissingSettings,
+  showInformationMessage,
+} from "./helpers/userInteraction";
+import { clearTokens, getAccessToken } from "./services/oauth";
+import { CONFIG_KEY, SettingsProvider } from "./services/settings";
 
 export function activate(context: vscode.ExtensionContext): void {
-  const settings = Settings.instance;
-  if (!settings.validate()) {
-    promptMissingSettings();
-  }
+  // TODO
+  // const settings = Settings.instance;
+  // if (!settings.validate()) {
+  //   promptMissingSettings();
+  // }
 
-  const secretStorage = context.secrets;
+  SettingsProvider.configure(context.secrets);
 
   const disposables = [
     vscode.commands.registerCommand(
@@ -38,14 +42,22 @@ export function activate(context: vscode.ExtensionContext): void {
       "al-id-range-manager.switchObjectIDs",
       SwitchObjectIDsCommand,
     ),
-    vscode.commands.registerCommand("al-id-range-manager.test", () => {
-      getAccessToken(secretStorage);
-    }),
+    vscode.commands.registerCommand(
+      "al-id-range-manager.clearCredentials",
+      () => clearTokens(context.secrets),
+    ),
+    vscode.workspace.onDidChangeConfiguration(listener),
+    SettingsProvider.addConfigurationChangeListener(),
   ];
 
   context.subscriptions.push(...disposables);
 }
 
+function listener(e: vscode.ConfigurationChangeEvent) {
+  const affectsConfiguration = e.affectsConfiguration(CONFIG_KEY);
+  showInformationMessage(`affectsConfiguration: ${affectsConfiguration}`);
+}
+
 export function deactivate(): void {
-  throw new Error("Not implemented yet!");
+  //
 }

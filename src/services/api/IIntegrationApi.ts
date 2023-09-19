@@ -5,7 +5,7 @@ import Extension from "../../models/extension";
 import ExtensionObject from "../../models/extensionObject";
 import ExtensionObjectLine from "../../models/extensionObjectLine";
 import BcClient, { ClientBuilder } from "../bcClient";
-import { getAccessToken } from "../oauthClient";
+import { getAccessToken } from "../oauth";
 import Settings, { SettingsProvider } from "../settings";
 import IntegrationApiv1n0 from "./IntegrationApiv1n0";
 import IntegrationApiv1n1 from "./IntegrationApiv1n1";
@@ -34,8 +34,6 @@ export type CreateBCExtensionObjectLineRequest = {
 
 export interface IIntegrationApi {
   bcClient: BcClient;
-
-  getApiVersionURLFormatted(): string;
 
   getBcExtension(id: string): Promise<Extension | null>;
   getBcExtensionObject(
@@ -72,17 +70,23 @@ export class IntegrationApiProvider {
       return this.instance;
     }
 
-    const settings = SettingsProvider.getSettings();
-    this.instance = IntegrationApiProvider.buildIntegrationApi(settings);
+    const { settings } = SettingsProvider.getSettingsAndSubscribe(this.reset);
+    this.instance = IntegrationApiProvider.buildIntegrationApi(settings); // TODO this can fail
 
     return this.instance;
   }
 
+  private static reset(settings: Settings): void {
+    this.instance = undefined;
+    this.instance = IntegrationApiProvider.buildIntegrationApi(settings); // TODO this can fail
+  }
+
   private static buildIntegrationApi(settings: Settings): IIntegrationApi {
-    const bcClient = new BcClient(
-      IntegrationApiProvider.buildBaseUrl(settings),
-      IntegrationApiProvider.buildClientBuilder(settings),
-    );
+    const bcClient = new BcClient({
+      baseUrl: IntegrationApiProvider.buildBaseUrl(settings),
+      tenant: settings.apiTenant,
+      clientBuilder: IntegrationApiProvider.buildClientBuilder(settings),
+    });
 
     switch (settings.apiVersion) {
       case "1.1":

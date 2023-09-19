@@ -8,13 +8,11 @@ const SCOPE = [
   "https://api.businesscentral.dynamics.com/user_impersonation",
   "offline_access",
 ].join(" ");
+const TENANT = "common";
 
 export async function getAccessToken(
   secretStorage: SecretStorage,
 ): Promise<string> {
-  // TODO remove tokens when settings change
-  // => add the client id + tenant + scopes as a key for comparison?
-
   const { accessToken, expiresAt, refreshToken } =
     await getStoredTokens(secretStorage);
 
@@ -70,6 +68,14 @@ async function storeTokens(
   ]);
 }
 
+export async function clearTokens(secretStorage: SecretStorage): Promise<void> {
+  await Promise.all([
+    secretStorage.delete("deviceFlow.accessToken"),
+    secretStorage.delete("deviceFlow.expiresAt"),
+    secretStorage.delete("deviceFlow.refreshToken"),
+  ]);
+}
+
 async function fetchAccessToken(
   refreshToken: string | undefined,
 ): Promise<AccessTokenResponse> {
@@ -120,7 +126,7 @@ async function authenticateInteractive(): Promise<AccessTokenResponse> {
 
 async function fetchDeviceCode(): Promise<DeviceCodeResponse> {
   const response = await axios.post(
-    "https://login.microsoftonline.com/common/oauth2/v2.0/devicecode",
+    `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/devicecode`,
     new URLSearchParams({
       client_id: CLIENT_ID,
       scope: SCOPE,
@@ -183,7 +189,7 @@ async function fetchTokenWithDeviceCode({
   device_code,
 }: DeviceCodeResponse): Promise<FetchTokenResponse> {
   const response = await axios.post(
-    "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`,
     new URLSearchParams({
       client_id: CLIENT_ID,
       grant_type: "urn:ietf:params:oauth:grant-type:device_code",
@@ -251,7 +257,7 @@ async function fetchTokenWithRefreshToken(
   refreshToken: string,
 ): Promise<AccessTokenResponse> {
   const response = await axios.post(
-    "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`,
     new URLSearchParams({
       client_id: CLIENT_ID,
       scope: SCOPE,

@@ -1,7 +1,8 @@
 import { Resources } from "../bcClient";
+import { SettingsProvider } from "../settings";
 import {
   CreateBCExtensionObjectRequest,
-  IIntegrationApi
+  IIntegrationApi,
 } from "./IIntegrationApi";
 import IntegrationApiv1n0 from "./IntegrationApiv1n0";
 
@@ -9,13 +10,11 @@ export default class IntegrationApiv1n1
   extends IntegrationApiv1n0
   implements IIntegrationApi
 {
-  public getApiVersionURLFormatted(): string {
-    return "v1.1";
-  }
-
   async createBcExtensionObject(
     createBCExtensionObjectRequest: CreateBCExtensionObjectRequest,
   ): Promise<number> {
+    const settings = SettingsProvider.getSettings();
+
     if (createBCExtensionObjectRequest.objectID !== 0) {
       await this.bcClient.callAction(
         Resources.extension,
@@ -26,7 +25,7 @@ export default class IntegrationApiv1n1
           objectID: createBCExtensionObjectRequest.objectID,
           objectName: createBCExtensionObjectRequest.objectName,
           extendsObjectName: createBCExtensionObjectRequest.extendsObjectName,
-          createdBy: this.bcClient.username?.substring(0, 50) ?? "", // FIXME use createdby in BC?
+          createdBy: settings.apiUsername?.substring(0, 50) ?? "",
         },
       );
       return createBCExtensionObjectRequest.objectID;
@@ -39,7 +38,7 @@ export default class IntegrationApiv1n1
         objectType: createBCExtensionObjectRequest.objectType,
         objectName: createBCExtensionObjectRequest.objectName,
         extendsObjectName: createBCExtensionObjectRequest.extendsObjectName,
-        createdBy: this.bcClient.username?.substring(0, 50) ?? "",
+        createdBy: settings.apiUsername?.substring(0, 50) ?? "",
       },
     );
     const objectId = Number(response);
