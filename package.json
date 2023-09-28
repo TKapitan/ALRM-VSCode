@@ -3,7 +3,7 @@
   "displayName": "AL ID Range Manager",
   "description": "Manage your object ids in Microsoft Business Central.",
   "publisher": "ARTAAAEfromCzechiaKeptycz",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "icon": "resources/img/ALIDRangeManager.png",
   "engines": {
     "vscode": "^1.51.0"
@@ -35,10 +35,11 @@
             "Cloud"
           ],
           "markdownEnumDescriptions": [
-            "Requires **Base Url**, **Username** and **Password**",
-            ""
+            "Requires **Base Url**",
+            "Requires **Environment** and **Tenant**"
           ],
           "default": "OnPrem",
+          "markdownDescription": "Specifies the API type. **OnPrem** allows you to specify your own url in **Base Url**. Use **Cloud** in combination with **Oauth** authentication to connect to cloud BC.",
           "order": 0
         },
         "al-id-range-manager.baseUrlWithoutVersion": {
@@ -49,6 +50,7 @@
           "order": 1
         },
         "al-id-range-manager.apiVersion": {
+          "title": "Version",
           "type": "string",
           "enum": [
             "1.0",
@@ -61,7 +63,7 @@
         "al-id-range-manager.tenant": {
           "title": "Tenant",
           "type": "string",
-          "default": "common",
+          "default": "default",
           "description": "Specifies the tenant on which the API is hosted.",
           "order": 3
         },
@@ -94,14 +96,14 @@
           "title": "Username",
           "type": "string",
           "default": "",
-          "markdownDescription": "Specifies the username used for API calls when using **OnPrem** API with **Basic** authentication. Mandatory for **OnPrem** API.",
+          "markdownDescription": "Specifies the username used for API calls when using **OnPrem** API with **Basic** authentication.",
           "order": 7
         },
         "al-id-range-manager.password": {
           "title": "Password",
           "type": "string",
           "default": "",
-          "markdownDescription": "Specifies the password used for API calls when using **OnPrem** API with **Basic** authentication. Mandatory for **OnPrem** API.",
+          "markdownDescription": "Specifies the password used for API calls when using **OnPrem** API with **Basic** authentication.",
           "order": 8
         },
         "al-id-range-manager.snippets": {
