@@ -36,6 +36,10 @@ Allows to automatically switch IDs for all objects and table/enum extensions. Th
 
 Available since v0.6.1 and works with ALRM Business Central extension version 0.1.7.0.
 
+### ALRM: Clear credentials (oauth)
+
+Clears cached oauth credentials.
+
 ## Requirements
 
 To use this VS Code extension, you must set API connection to the backend system that store, validate & manage all extension objects & fields details.
