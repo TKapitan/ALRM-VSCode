@@ -7,15 +7,30 @@ import CreateBCExtensionObjectRequest from "./requests/createBcExtensionObjectRe
 import CreateBCExtensionRequest from "./requests/createBcExtensionRequest";
 
 export interface IIntegrationApi {
-    getApiVersionURLFormatted(): string;
-    
-    getBcExtension(id: string): Promise<Extension | null>;
-    getBcExtensionObject(extensionID: string, objectType: string, objectID: number): Promise<ExtensionObject | null>;
-    getBcExtensionObjectLine(extensionID: string, objectType: string, objectID: number, fieldID: number): Promise<ExtensionObjectLine | null>;
-    createBcExtension(createBCExtensionRequest: CreateBCExtensionRequest): Promise<Extension>;
-    createBcExtensionObject(createBCExtensionObjectRequest: CreateBCExtensionObjectRequest): Promise<number>;
-    createBcExtensionObjectLine(createBCExtensionObjectLineRequest: CreateBCExtensionObjectLineRequest): Promise<number>
-    getAllAssignableRanges(): Promise<AssignableRange[]>;
+  getApiVersionURLFormatted(): string;
 
-    isDeprecated(): boolean;
+  getBcExtension(id: string): Promise<Extension | null>;
+  getBcExtensionObject(
+    extensionID: string,
+    objectType: string,
+    objectID: number,
+  ): Promise<ExtensionObject | null>;
+  getBcExtensionObjectLine(
+    extensionID: string,
+    objectType: string,
+    objectID: number,
+    fieldID: number,
+  ): Promise<ExtensionObjectLine | null>;
+  createBcExtension(
+    createBCExtensionRequest: CreateBCExtensionRequest,
+  ): Promise<Extension>;
+  createBcExtensionObject(
+    createBCExtensionObjectRequest: CreateBCExtensionObjectRequest,
+  ): Promise<number>;
+  createBcExtensionObjectLine(
+    createBCExtensionObjectLineRequest: CreateBCExtensionObjectLineRequest,
+  ): Promise<number>;
+  getAllAssignableRanges(): Promise<AssignableRange[]>;
+
+  isDeprecated(): boolean;
 }

@@ -1,22 +1,27 @@
 export default class ExtensionObject {
-    rangeCode: string;
-    alternateRangeCode: string;
-    objectID: number;
-    alternateObjectID: number;
+  rangeCode: string;
+  alternateRangeCode: string;
+  objectID: number;
+  alternateObjectID: number;
 
-    constructor(rangeCode: string, alternateRangeCode: string, objectID: number, alternateObjectID: number) {
-        this.rangeCode = rangeCode;
-        this.alternateRangeCode = alternateRangeCode;
-        this.objectID = objectID;
-        this.alternateObjectID = alternateObjectID;
-    }
+  constructor(
+    rangeCode: string,
+    alternateRangeCode: string,
+    objectID: number,
+    alternateObjectID: number,
+  ) {
+    this.rangeCode = rangeCode;
+    this.alternateRangeCode = alternateRangeCode;
+    this.objectID = objectID;
+    this.alternateObjectID = alternateObjectID;
+  }
 
-    public static fromJson(json: any): ExtensionObject {
-        return new ExtensionObject(
-            'rangeCode' in json ? json['rangeCode'] : '',
-            'alternateRangeCode' in json ? json['alternateRangeCode'] : '',
-            'objectID' in json ? json['objectID'] : 0,
-            'alternateObjectID' in json ? json['alternateObjectID'] : 0,
-        );
-    }
+  public static fromJson(json: any): ExtensionObject {
+    return new ExtensionObject(
+      "rangeCode" in json ? json["rangeCode"] : "",
+      "alternateRangeCode" in json ? json["alternateRangeCode"] : "",
+      "objectID" in json ? json["objectID"] : 0,
+      "alternateObjectID" in json ? json["alternateObjectID"] : 0,
+    );
+  }
 }
