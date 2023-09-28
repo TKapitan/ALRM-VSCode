@@ -16,7 +16,7 @@ export async function getAccessToken(
   const { accessToken, expiresAt, refreshToken } =
     await getStoredTokens(secretStorage);
 
-  if (accessToken && expiresAt && Date.now() - expiresAt > 1000 * 60) {
+  if (accessToken && expiresAt && expiresAt - Date.now() > 1000 * 60) {
     return accessToken;
   }
 
@@ -151,7 +151,7 @@ async function promptUser(
 ): Promise<boolean> {
   const result = await window.showInformationMessage(
     deviceCodeResponse.message,
-    "Open",
+    "Copy & Open",
   );
 
   if (result === undefined) {

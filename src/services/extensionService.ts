@@ -9,16 +9,16 @@ import { ObjectType } from "../models/objectType";
 import {
   CreateBCExtensionObjectRequest,
   IIntegrationApi,
-  IntegrationApiProvider
+  IntegrationApiProvider,
 } from "./api/IIntegrationApi";
 import { readAppJson } from "./fileService";
 
 export default class ExtensionService {
-  private static cache: Record<string, Extension> = {}; // TODO also clear this on settings change?
+  private static cache: Record<string, Extension> = {}; // XXX not cleared when settings change
   private iIntegrationApi: IIntegrationApi;
 
   constructor() {
-    this.iIntegrationApi = IntegrationApiProvider.api; // TODO ?
+    this.iIntegrationApi = IntegrationApiProvider.api;
   }
 
   public async getExtension(workspace: vscode.Uri): Promise<Extension | null> {

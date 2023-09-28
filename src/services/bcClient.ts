@@ -20,35 +20,24 @@ interface QueryParameters {
   filter?: string;
 }
 
-export type ClientBuilder = () => Promise<AxiosInstance> | AxiosInstance;
-
 export default class BcClient {
   private baseUrl: string;
   private tenant: string | undefined;
-  private clientBuilder: ClientBuilder;
+  private httpClient: AxiosInstance;
 
   constructor({
     baseUrl,
     tenant,
-    clientBuilder,
+    httpClient,
   }: {
     baseUrl: string;
     tenant: string | undefined;
-    clientBuilder: ClientBuilder;
+    httpClient: AxiosInstance;
   }) {
-    // TODO this.validateSettings(this.settings);
     this.baseUrl = baseUrl;
     this.tenant = tenant;
-    this.clientBuilder = clientBuilder;
+    this.httpClient = httpClient;
   }
-
-  // TODO move elsewhere
-  // private validateSettings(settings: Settings) {
-  //   // TODO move elsewhere
-  //   if (!settings.validate()) {
-  //     throw new Error("Provide api url, name and password in settings!");
-  //   }
-  // }
 
   public async read(resource: string, id: string): Promise<Object> {
     const response = await this.sendRequest("GET", { resource, id });
@@ -140,9 +129,7 @@ export default class BcClient {
   ): Promise<AxiosResponse> {
     const url = this.buildUrl(urlParameters);
 
-    const axios = await this.clientBuilder();
-
-    const response = await axios.request({
+    const response = await this.httpClient.request({
       url: url,
       method: method,
       headers: {

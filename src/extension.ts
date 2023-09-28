@@ -5,19 +5,18 @@ import NewObjectCommand from "./commands/newObject";
 import NewObjectLineCommand from "./commands/newObjectLine";
 import SwitchObjectIDsCommand from "./commands/switchObjectIDs";
 import SynchronizeCommand from "./commands/synchronize";
-import {
-  promptMissingSettings,
-  showInformationMessage,
-} from "./helpers/userInteraction";
-import { clearTokens, getAccessToken } from "./services/oauth";
-import { CONFIG_KEY, SettingsProvider } from "./services/settings";
+import { showWarningMessage } from "./helpers/userInteraction";
+import { IntegrationApiProvider } from "./services/api/IIntegrationApi";
+import { clearTokens } from "./services/oauth";
+import { SettingsProvider } from "./services/settings";
 
 export function activate(context: vscode.ExtensionContext): void {
-  // TODO
-  // const settings = Settings.instance;
-  // if (!settings.validate()) {
-  //   promptMissingSettings();
-  // }
+  const api = IntegrationApiProvider.validate();
+  if (api?.isDeprecated()) {
+    showWarningMessage(
+      "You are using deprecated API version. Please update your BC backend app & setting in the VS Code.",
+    );
+  }
 
   SettingsProvider.configure(context.secrets);
 
@@ -46,16 +45,10 @@ export function activate(context: vscode.ExtensionContext): void {
       "al-id-range-manager.clearCredentials",
       () => clearTokens(context.secrets),
     ),
-    vscode.workspace.onDidChangeConfiguration(listener),
     SettingsProvider.addConfigurationChangeListener(),
   ];
 
   context.subscriptions.push(...disposables);
-}
-
-function listener(e: vscode.ConfigurationChangeEvent) {
-  const affectsConfiguration = e.affectsConfiguration(CONFIG_KEY);
-  showInformationMessage(`affectsConfiguration: ${affectsConfiguration}`);
 }
 
 export function deactivate(): void {

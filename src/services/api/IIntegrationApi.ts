@@ -1,12 +1,16 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
+import {
+  InvalidSettingsError,
+  promptMissingSettings,
+} from "../../helpers/userInteraction";
 import AssignableRange from "../../models/assignableRange";
 import Extension from "../../models/extension";
 import ExtensionObject from "../../models/extensionObject";
 import ExtensionObjectLine from "../../models/extensionObjectLine";
-import BcClient, { ClientBuilder } from "../bcClient";
+import BcClient from "../bcClient";
 import { getAccessToken } from "../oauth";
-import Settings, { SettingsProvider } from "../settings";
+import { Settings, SettingsProvider } from "../settings";
 import IntegrationApiv1n0 from "./IntegrationApiv1n0";
 import IntegrationApiv1n1 from "./IntegrationApiv1n1";
 
@@ -64,28 +68,51 @@ export interface IIntegrationApi {
 
 export class IntegrationApiProvider {
   private static instance: IIntegrationApi | undefined;
+  private static removeSettingsUpdateListener: () => void | undefined;
+
+  static validate(): IIntegrationApi | undefined {
+    try {
+      return this.buildInstance();
+    } catch {
+      return undefined;
+    }
+  }
 
   static get api(): IIntegrationApi {
     if (this.instance) {
       return this.instance;
     }
 
-    const { settings } = SettingsProvider.getSettingsAndSubscribe(this.reset);
-    this.instance = IntegrationApiProvider.buildIntegrationApi(settings); // TODO this can fail
-
+    this.instance = this.buildInstance();
     return this.instance;
   }
 
-  private static reset(settings: Settings): void {
+  private static buildInstance(): IIntegrationApi {
+    this.removeSettingsUpdateListener?.call(this);
+    const { settings, removeListener } =
+      SettingsProvider.getSettingsAndSubscribe(this.reset);
+    this.removeSettingsUpdateListener = removeListener;
+
+    try {
+      return IntegrationApiProvider.buildIntegrationApi(settings);
+    } catch (error) {
+      if (error instanceof InvalidSettingsError) {
+        promptMissingSettings(error.message);
+      }
+      throw error;
+    }
+  }
+
+  private static reset(): void {
     this.instance = undefined;
-    this.instance = IntegrationApiProvider.buildIntegrationApi(settings); // TODO this can fail
+    this.instance = this.buildInstance();
   }
 
   private static buildIntegrationApi(settings: Settings): IIntegrationApi {
     const bcClient = new BcClient({
       baseUrl: IntegrationApiProvider.buildBaseUrl(settings),
       tenant: settings.apiTenant,
-      clientBuilder: IntegrationApiProvider.buildClientBuilder(settings),
+      httpClient: IntegrationApiProvider.buildClient(settings),
     });
 
     switch (settings.apiVersion) {
@@ -94,7 +121,7 @@ export class IntegrationApiProvider {
       case "1.0":
         return new IntegrationApiv1n0(bcClient);
       default:
-        throw new Error(
+        throw new InvalidSettingsError(
           `Invalid version ${settings.apiVersion}, supported values are: ['1.1', '1.0'].`,
         );
     }
@@ -107,21 +134,20 @@ export class IntegrationApiProvider {
       case "OnPrem":
         return userUrl(settings);
       default:
-        throw new Error(
-          // TODO repeated
+        throw new InvalidSettingsError(
           `Invalid apiType ${settings.apiType}, supported values are: ['OnPrem', 'Cloud'].`,
         );
     }
   }
 
-  private static buildClientBuilder(settings: Settings): ClientBuilder {
+  private static buildClient(settings: Settings): AxiosInstance {
     switch (settings.authenticationType) {
       case "Basic":
-        return () => basicClientBuilder(settings);
+        return buildBasicAuthClient(settings);
       case "Oauth":
-        return async () => oauthClientBuilder(settings);
+        return buildOauthClient(settings);
       default:
-        throw new Error(
+        throw new InvalidSettingsError(
           `Unimplemented authentication type: ${settings.authenticationType}`,
         );
     }
@@ -130,10 +156,10 @@ export class IntegrationApiProvider {
 
 function userUrl(settings: Settings): string {
   if (!settings.apiBaseUrl) {
-    throw new Error(`Invalid settings: Missing apiBaseUrl.`);
+    throw new InvalidSettingsError(`Invalid settings: Missing apiBaseUrl.`);
   }
   if (!settings.apiVersion) {
-    throw new Error(`Invalid settings: Missing apiVersion.`);
+    throw new InvalidSettingsError(`Invalid settings: Missing apiVersion.`);
   }
 
   let baseUrl = settings.apiBaseUrl;
@@ -146,20 +172,18 @@ function userUrl(settings: Settings): string {
     baseUrl += "companies(" + settings.apiCompanyId + ")/";
   }
 
-  // FIXME tenant is now not used?
-
   return baseUrl;
 }
 
 function cloudUrl(settings: Settings) {
   if (!settings.apiTenant) {
-    throw new Error(`Invalid settings: Missing apiTenant.`);
+    throw new InvalidSettingsError(`Invalid settings: Missing apiTenant.`);
   }
   if (!settings.apiEnvironment) {
-    throw new Error(`Invalid settings: Missing apiEnvironment.`);
+    throw new InvalidSettingsError(`Invalid settings: Missing apiEnvironment.`);
   }
   if (!settings.apiVersion) {
-    throw new Error(`Invalid settings: Missing apiVersion.`);
+    throw new InvalidSettingsError(`Invalid settings: Missing apiVersion.`);
   }
 
   const tenant = settings.apiTenant;
@@ -174,7 +198,7 @@ function cloudUrl(settings: Settings) {
   return url;
 }
 
-function basicClientBuilder(settings: Settings): AxiosInstance {
+function buildBasicAuthClient(settings: Settings): AxiosInstance {
   const authorization: string = Buffer.from(
     `${settings.apiUsername}:${settings.apiPassword}`,
   ).toString("base64");
@@ -186,13 +210,24 @@ function basicClientBuilder(settings: Settings): AxiosInstance {
   });
 }
 
-async function oauthClientBuilder(settings: Settings): Promise<AxiosInstance> {
-  // TODO since accessToken is fetched only once, the client returned by this function cannot be reliably reused
-  const accessToken = await getAccessToken(settings.secretStorage);
+// wraps axios instance to replace request method to allow us to fetch token before each request
+function buildOauthClient(settings: Settings): AxiosInstance {
+  const client = axios.create();
+  const innerRequest = client.request;
 
-  return axios.create({
-    headers: {
-      authorization: `Bearer ${accessToken}`,
-    },
-  });
+  client.request = async function wrappedRequest<T = any, R = AxiosResponse<T>>(
+    config: AxiosRequestConfig,
+  ): Promise<R> {
+    const accessToken = await getAccessToken(settings.secretStorage);
+
+    return innerRequest({
+      ...config,
+      headers: {
+        ...config.headers,
+        authorization: `Bearer ${accessToken}`,
+      },
+    });
+  };
+
+  return client;
 }

@@ -4,7 +4,7 @@ import {
   getUserInput,
   getUserSelection,
   promptInitialization,
-  showErrorMessage
+  showErrorMessage,
 } from "../helpers/userInteraction";
 import {
   ObjectType,
@@ -13,15 +13,15 @@ import {
   runtime05Objects,
   runtime06Objects,
   runtime07Objects,
-  substituteObjectInfo
+  substituteObjectInfo,
 } from "../models/objectType";
 import ExtensionService from "../services/extensionService";
 import {
   getCurrentWorkspaceUri,
   readAppJson,
-  readSnippetFile
+  readSnippetFile,
 } from "../services/fileService";
-import Settings, { SettingsProvider } from "../services/settings";
+import { SettingsProvider } from "../services/settings";
 
 export default async function newObjectCommand(): Promise<void> {
   try {
@@ -41,17 +41,17 @@ export default async function newObjectCommand(): Promise<void> {
 
     const snippetFileContent = readSnippetFile(objectType);
 
-    let objectName;
+    let objectName: string | undefined;
     // eslint-disable-next-line no-constant-condition
     while (true) {
       objectName = await getUserInput(`Enter ${ObjectType[objectType]} name`);
       if (objectName === undefined) {
         return; // canceled
       }
-      if (objectName?.length <= 30) {
+      if (objectName.length <= 30) {
         break;
       }
-      showErrorMessage("Maximal lenght of AL Object name has to be 30 chars.");
+      showErrorMessage("Maximal length of AL Object name has to be 30 chars.");
     }
 
     const newObjectId = await service.createExtensionObject({
@@ -115,18 +115,17 @@ async function promptObjectSnippetSelection(
   const items: vscode.QuickPickItem[] = [];
   const settings = SettingsProvider.getSettings();
 
-  Object.keys(snippetObject).forEach((key) => {
+  for (const [key, value] of Object.entries(snippetObject)) {
     let description = "";
     let prefix = "";
-    const value = snippetObject[key as keyof typeof snippetObject];
-    if ("description" in value) {
-      description = value["description"] as string; // FIXME
+    if ("description" in value && typeof value["description"] === "string") {
+      description = value["description"] as string;
     }
-    if ("prefix" in value) {
+    if ("prefix" in value && typeof value["prefix"] === "string") {
+      prefix = value["prefix"] as string;
       if (firstPrefix === "") {
-        firstPrefix = value["prefix"] as string; // FIXME
+        firstPrefix = prefix;
       }
-      prefix = value["prefix"] as string; // FIXME
     }
     if (
       prefix === "" ||
@@ -138,7 +137,7 @@ async function promptObjectSnippetSelection(
         detail: description,
       });
     }
-  });
+  }
 
   if (items.length === 1) {
     return snippetObject[
@@ -173,7 +172,7 @@ async function createObjectFile(
     language: "al",
   });
   const textEditor = await vscode.window.showTextDocument(textDocument);
-  textEditor.insertSnippet(await snippet);
+  textEditor.insertSnippet(snippet);
 }
 
 async function buildObjectSnippet(
