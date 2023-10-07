@@ -40,8 +40,8 @@ export async function getUserInput(
 }
 
 export async function getUserSelection(
-  items: QuickPickItem[],
-): Promise<QuickPickItem | undefined> {
+  items: vscode.QuickPickItem[],
+): Promise<vscode.QuickPickItem | undefined> {
   return await vscode.window.showQuickPick(items, { ignoreFocusOut: true });
 }
 
@@ -56,13 +56,16 @@ export async function promptInitialization(): Promise<void> {
   }
 }
 
-export async function promptMissingSettings(): Promise<void> {
+export async function promptMissingSettings(message: string): Promise<void> {
   const openSettingsAction = "Open Settings";
 
-  const result = await showWarningMessage("Connection info is missing", [
-    openSettingsAction,
-  ]);
+  const result = await showWarningMessage(
+    `Some settings are missing or invalid:\n${message}`,
+    [openSettingsAction],
+  );
   if (result === openSettingsAction) {
     vscode.commands.executeCommand("workbench.action.openSettings", CONFIG_KEY); // XXX create a dict
   }
 }
+
+export class InvalidSettingsError extends Error {}

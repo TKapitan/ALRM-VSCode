@@ -5,14 +5,21 @@ import NewObjectCommand from "./commands/newObject";
 import NewObjectLineCommand from "./commands/newObjectLine";
 import SwitchObjectIDsCommand from "./commands/switchObjectIDs";
 import SynchronizeCommand from "./commands/synchronize";
-import { promptMissingSettings } from "./helpers/userInteraction";
-import Settings from "./services/settings";
+import { showWarningMessage } from "./helpers/userInteraction";
+import { IntegrationApiProvider } from "./services/api/IIntegrationApi";
+import { clearTokens } from "./services/oauth";
+import { SettingsProvider } from "./services/settings";
 
 export function activate(context: vscode.ExtensionContext): void {
-  const settings = Settings.instance;
-  if (!settings.validate()) {
-    promptMissingSettings();
+  const api = IntegrationApiProvider.validate();
+  if (api?.isDeprecated()) {
+    showWarningMessage(
+      "You are using deprecated API version. Please update your BC backend app & setting in the VS Code.",
+    );
   }
+
+  SettingsProvider.configure(context.secrets);
+
   const disposables = [
     vscode.commands.registerCommand(
       "al-id-range-manager.initialize",
@@ -34,11 +41,16 @@ export function activate(context: vscode.ExtensionContext): void {
       "al-id-range-manager.switchObjectIDs",
       SwitchObjectIDsCommand,
     ),
+    vscode.commands.registerCommand(
+      "al-id-range-manager.clearCredentials",
+      () => clearTokens(context.secrets),
+    ),
+    SettingsProvider.addConfigurationChangeListener(),
   ];
 
   context.subscriptions.push(...disposables);
 }
 
 export function deactivate(): void {
-  throw new Error("Not implemented yet!");
+  //
 }

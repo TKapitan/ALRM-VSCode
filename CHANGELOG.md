@@ -10,6 +10,14 @@
 
 ## [Released Versions]
 
+### v0.7.0
+
+- Date of release: 03/12/2022
+
+#### Added
+
+- Support for Oauth authentication for cloud BC (#10)
+
 ### v0.6.2
 
 - Date of release: 03/12/2022
@@ -23,6 +31,7 @@ Fixes
 - Date of release: 27/06/2022
 
 Major changes
+
 - Beta version of 'Switch IDs' command to be able to change ID ranges for all objects (for example PTE-ONPREM range vs. CLOUD-ONLY range)
 
 Fixes

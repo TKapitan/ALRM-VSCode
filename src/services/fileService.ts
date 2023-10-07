@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 
 import App from "../models/app";
 import { ObjectType } from "../models/objectType";
-import Settings from "./settings";
+import { SettingsProvider } from "./settings";
 
 export function readAppJson(workspaceFolderUri?: vscode.Uri): App {
   if (!workspaceFolderUri) {
@@ -51,15 +51,15 @@ export function readSnippetFile(objectType: ObjectType): Buffer {
     throw new Error("User profile inaccessible!");
   }
 
+  const settings = SettingsProvider.getSettings();
+
   const files = fs.readdirSync(join(userProfilePath, ".vscode", "extensions"));
   const alLanguageExtDirs = files.filter((e) =>
-    e.startsWith(Settings.instance.snippets.getSnippetFolder(objectType)),
+    e.startsWith(settings.snippets.getSnippetFolder(objectType)),
   );
 
-  const snippetFileName =
-    Settings.instance.snippets.getSnippetFileName(objectType);
-  const snippetSubFolder =
-    Settings.instance.snippets.getSnippetSubFolder(objectType);
+  const snippetFileName = settings.snippets.getSnippetFileName(objectType);
+  const snippetSubFolder = settings.snippets.getSnippetSubFolder(objectType);
   for (const i in alLanguageExtDirs) {
     const snippetFilePath = join(
       userProfilePath,

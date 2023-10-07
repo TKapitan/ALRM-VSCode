@@ -15,7 +15,7 @@ import {
   translateObjectType,
   translateObjectTypeFromObjectType
 } from "../models/objectType";
-import CreateBCExtensionObjectRequest from "../services/api/requests/createBcExtensionObjectRequest";
+import { CreateBCExtensionObjectRequest } from "../services/api/IIntegrationApi";
 import ExtensionService from "../services/extensionService";
 import { getCurrentWorkspaceUri } from "../services/fileService";
 
@@ -396,13 +396,13 @@ async function tryScanObject(
     if (extension === null) {
       throw new Error("Can not create extension object for unknown extension.");
     }
-    const createBCExtensionObjectRequest = new CreateBCExtensionObjectRequest(
+    const createBCExtensionObjectRequest: CreateBCExtensionObjectRequest = {
       extension,
-      translateObjectType(objectTypeString).toString(),
-      +objectID,
+      objectType: translateObjectType(objectTypeString).toString(),
+      objectID: +objectID,
       objectName,
       extendsObjectName,
-    );
+    };
 
     console.log(
       "Registering Object type: " +

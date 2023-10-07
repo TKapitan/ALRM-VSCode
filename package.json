@@ -3,10 +3,10 @@
   "displayName": "AL ID Range Manager",
   "description": "Manage your object ids in Microsoft Business Central.",
   "publisher": "ARTAAAEfromCzechiaKeptycz",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "icon": "resources/img/ALIDRangeManager.png",
   "engines": {
-    "vscode": "^1.51.0"
+    "vscode": "^1.63.0"
   },
   "categories": [
     "Other"
@@ -27,56 +27,95 @@
     "configuration": {
       "title": "ALRM: AL ID Range Manager",
       "properties": {
+        "al-id-range-manager.apiType": {
+          "title": "API Type",
+          "type": "string",
+          "enum": [
+            "OnPrem",
+            "Cloud"
+          ],
+          "markdownEnumDescriptions": [
+            "Requires **Base Url**",
+            "Requires **Environment** and **Tenant**"
+          ],
+          "default": "OnPrem",
+          "markdownDescription": "Specifies the API type. **OnPrem** allows you to specify your own url in **Base Url**. Use **Cloud** in combination with **Oauth** authentication to connect to cloud BC.",
+          "order": 0
+        },
         "al-id-range-manager.baseUrlWithoutVersion": {
           "type": "string",
+          "title": "Base Url",
           "default": "",
-          "description": "API Base URL without version (for example: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/)"
+          "markdownDescription": "Specifies the API Base URL without version (for example: https://{server}:{port}/{instance}/api/teamARTAAAE/extension/). Mandatory for **OnPrem** API.",
+          "order": 1
         },
         "al-id-range-manager.apiVersion": {
+          "title": "Version",
           "type": "string",
           "enum": [
             "1.0",
             "1.1"
           ],
-          "default": "1.0",
-          "description": "API Version"
+          "default": "1.1",
+          "description": "Specifies the API version. Select the highest available version installed on your server.",
+          "order": 2
         },
         "al-id-range-manager.tenant": {
+          "title": "Tenant",
           "type": "string",
           "default": "default",
-          "description": "API Tenant (Specifies tenant on which the API is hosted.)"
+          "description": "Specifies the tenant on which the API is hosted.",
+          "order": 3
+        },
+        "al-id-range-manager.environment": {
+          "title": "Environment",
+          "type": "string",
+          "default": "",
+          "description": "Specifies the environment (instance) on which the API is hosted.",
+          "order": 4
         },
         "al-id-range-manager.companyId": {
+          "title": "Company Id",
           "type": "string",
           "default": "",
-          "description": "API Company Id (Specifies the ID of the company for API URL. If connecting to the instance's default company, the field can be blank.)"
+          "description": "Specifies the ID of the company for API URL. If connecting to the instance's default company, the field can be blank.",
+          "order": 5
         },
         "al-id-range-manager.authenticationType": {
+          "title": "Authentication type",
           "type": "string",
           "enum": [
-            "Basic"
+            "Basic",
+            "Oauth"
           ],
           "default": "Basic",
-          "description": "API Authentication Type"
+          "markdownDescription": "Specifies the API authentication type. **Cloud** API supports **Oauth** only.",
+          "order": 6
         },
         "al-id-range-manager.username": {
+          "title": "Username",
           "type": "string",
           "default": "",
-          "description": "API username"
+          "markdownDescription": "Specifies the username used for API calls when using **OnPrem** API with **Basic** authentication.",
+          "order": 7
         },
         "al-id-range-manager.password": {
+          "title": "Password",
           "type": "string",
           "default": "",
-          "description": "API password"
+          "markdownDescription": "Specifies the password used for API calls when using **OnPrem** API with **Basic** authentication.",
+          "order": 8
         },
         "al-id-range-manager.snippets": {
+          "title": "Snippets",
           "type": "string",
           "enum": [
             "Default",
             "Waldo's CRS AL Language Snippets"
           ],
           "default": "Default",
-          "description": "Snippets"
+          "description": "Snippets",
+          "order": 9
         }
       }
     },
@@ -100,6 +139,10 @@
       {
         "command": "al-id-range-manager.switchObjectIDs",
         "title": "ALRM: Switch object IDs"
+      },
+      {
+        "command": "al-id-range-manager.clearCredentials",
+        "title": "ALRM: Clear credentials (oauth)"
       }
     ]
   },
@@ -115,7 +158,7 @@
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.0",
     "@types/node": "^12.19.5",
-    "@types/vscode": "^1.51.0",
+    "@types/vscode": "^1.63.0",
     "@typescript-eslint/eslint-plugin": "^4.9.1",
     "@typescript-eslint/parser": "^4.9.1",
     "eslint": "^7.15.0",

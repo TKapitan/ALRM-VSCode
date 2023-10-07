@@ -6,19 +6,19 @@ import Extension from "../models/extension";
 import ExtensionObject from "../models/extensionObject";
 import ExtensionObjectLine from "../models/extensionObjectLine";
 import { ObjectType } from "../models/objectType";
-import { IIntegrationApi } from "./api/IIntegrationApi";
-import CreateBCExtensionObjectLineRequest from "./api/requests/createBcExtensionObjectLineRequest";
-import CreateBCExtensionObjectRequest from "./api/requests/createBcExtensionObjectRequest";
-import CreateBCExtensionRequest from "./api/requests/createBcExtensionRequest";
+import {
+  CreateBCExtensionObjectRequest,
+  IIntegrationApi,
+  IntegrationApiProvider,
+} from "./api/IIntegrationApi";
 import { readAppJson } from "./fileService";
-import Settings from "./settings";
 
 export default class ExtensionService {
-  private static cache: Record<string, Extension> = {};
+  private static cache: Record<string, Extension> = {}; // XXX not cleared when settings change
   private iIntegrationApi: IIntegrationApi;
 
   constructor() {
-    this.iIntegrationApi = Settings.instance.integrationApi;
+    this.iIntegrationApi = IntegrationApiProvider.api;
   }
 
   public async getExtension(workspace: vscode.Uri): Promise<Extension | null> {
@@ -66,15 +66,12 @@ export default class ExtensionService {
     app: App,
     rangeCode?: string,
   ): Promise<Extension> {
-    const createBCExtensionRequest = new CreateBCExtensionRequest(
-      app.id,
-      rangeCode ?? "",
-      app.name.substring(0, 50),
-      app.description.substr(0, 250),
-    );
-    const extension = await this.iIntegrationApi.createBcExtension(
-      createBCExtensionRequest,
-    );
+    const extension = await this.iIntegrationApi.createBcExtension({
+      id: app.id,
+      rangeCode: rangeCode ?? "",
+      name: app.name.substring(0, 50),
+      description: app.description.substring(0, 250),
+    });
     ExtensionService.cache[workspace.fsPath] = extension;
     return extension;
   }
@@ -98,16 +95,13 @@ export default class ExtensionService {
         "Can not create extension object line for unknown extension.",
       );
     }
-    const createBCExtensionObjectLineRequest =
-      new CreateBCExtensionObjectLineRequest(
-        extension,
-        objectType.toString(),
-        objectId,
-        existingFieldOrValueId,
-      );
-    return await this.iIntegrationApi.createBcExtensionObjectLine(
-      createBCExtensionObjectLineRequest,
-    );
+
+    return await this.iIntegrationApi.createBcExtensionObjectLine({
+      extension,
+      objectType: objectType.toString(),
+      objectID: objectId,
+      fieldOrValueID: existingFieldOrValueId,
+    });
   }
 
   public async getAllAssignableRanges(): Promise<AssignableRange[]> {
